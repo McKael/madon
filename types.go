@@ -1,9 +1,6 @@
 package gondole
 
 import (
-	"github.com/urfave/cli"
-	"gopkg.in/asn1-ber.v1"
-	"net/textproto"
 	"time"
 )
 
