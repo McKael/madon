@@ -1,23 +1,15 @@
 package gondole
 
-import "time"
+import (
+	"github.com/urfave/cli"
+	"gopkg.in/asn1-ber.v1"
+	"net/textproto"
+	"time"
+)
 
 type Gondole struct {
-	Name string
-    RedirectURI string
-}
-
-type Account struct {
-	ID         int
-	Acct       string
-	Avatar     string
-	Followers  int
-	Followings int
-	Header     string
-	Note       string
-	Statuses   int
-	URL        string
-	Username   string
+	Name        string
+	RedirectURI string
 }
 
 type Client struct {
@@ -25,17 +17,122 @@ type Client struct {
 	BearerToken string
 }
 
-type Status struct {
+/*
+
+Entities:
+
+Everything manipulated/returned by the API
+*/
+
+type Account struct {
+	ID          int
+	Username    string
+	Acct        string
+	DisplayName string
+	Note        string
+	URL         string
+	Avatar      string
+	Header      string
+	Locked      bool
+	Followers   int
+	Followings  int
+	Statuses    int
+}
+
+type Application struct {
+	Name    string
+	Website string
+}
+
+type Attachement struct {
 	ID         int
-	Account    *Account
-	Content    string
-	CreatedAT  time.Time
-	Favourited bool
-	Favourites int
-	InReplyTo  int
-	Reblog     *Status
-	Reblogged  bool
-	Reblogs    int
-	URI        string
+	Type       string
 	URL        string
+	RemoteURL  string
+	PreviewURL string
+	TextURL    string
+}
+
+type Card struct {
+	URL         string
+	Title       string
+	Description string
+	Image       string
+}
+
+type Context struct {
+	Ancestors   []Status
+	Descendents []Status
+}
+
+type Error struct {
+	Text string
+}
+
+type Instance struct {
+	URI         string
+	Title       string
+	Description string
+	Email       string
+}
+
+type Mention struct {
+	ID       int
+	URL      string
+	Username string
+	Acct     string
+}
+
+type Notification struct {
+	ID        int
+	Type      string
+	CreatedAt time.Time
+	Account   *Account
+	Status    *Status
+}
+
+type Relationship struct {
+	Following  bool
+	FollowedBy bool
+	Blocking   bool
+	Muting     bool
+	Requested  bool
+}
+type Report struct {
+	ID          int
+	ActionTaken string
+}
+
+type Result struct {
+	Accounts []Account
+	Statutes []Status
+	Hashtags []Tag
+}
+
+type Status struct {
+	ID                 int
+	URI                string
+	URL                string
+	Account            *Account
+	InReplyToId        int
+	InReplyToAccountID int
+	Reblog             *Status
+	Content            string
+	CreatedAT          time.Time
+	Reblogs            int
+	Favourites         int
+	Reblogged          bool
+	Favourited         bool
+	Sensitive          bool
+	SpoilerText        string
+	Visibility         string
+	MediaAttachments   []Attachement
+	Mentions           []Mention
+	Tags               []Tag
+	App                Application
+}
+
+type Tag struct {
+	Name string
+	URL  string
 }
