@@ -27,6 +27,7 @@ Trying to define a name close to *Mastodon*, one could come up with *godon* and 
 
 ## References
 
+- [Mastodon API doc](https://github.com/tootsuite/mastodon/blob/master/docs/Using-the-API/API.md)
 - [Mastodon Ruby API](http://www.rubydoc.info/gems/mastodon-api/Mastodon/REST/API)
 - [Mastodon Python](https://mastodonpy.readthedocs.io/en/latest/)
 - [Mastodon repo](https://github.com/tootsuite/mastodon)
