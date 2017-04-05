@@ -22,7 +22,7 @@ Everything manipulated/returned by the API
 */
 
 type Account struct {
-	ID          int
+	ID          int64
 	Username    string
 	Acct        string
 	DisplayName string
@@ -42,7 +42,7 @@ type Application struct {
 }
 
 type Attachement struct {
-	ID         int
+	ID         int64
 	Type       string
 	URL        string
 	RemoteURL  string
@@ -74,14 +74,14 @@ type Instance struct {
 }
 
 type Mention struct {
-	ID       int
+	ID       int64
 	URL      string
 	Username string
 	Acct     string
 }
 
 type Notification struct {
-	ID        int
+	ID        int64
 	Type      string
 	CreatedAt time.Time
 	Account   *Account
@@ -96,7 +96,7 @@ type Relationship struct {
 	Requested  bool
 }
 type Report struct {
-	ID          int
+	ID          int64
 	ActionTaken string
 }
 
@@ -107,12 +107,12 @@ type Result struct {
 }
 
 type Status struct {
-	ID                 int
+	ID                 int64
 	URI                string
 	URL                string
 	Account            *Account
-	InReplyToId        int
-	InReplyToAccountID int
+	InReplyToId        int64
+	InReplyToAccountID int64
 	Reblog             *Status
 	Content            string
 	CreatedAT          time.Time
