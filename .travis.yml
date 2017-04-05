@@ -13,3 +13,4 @@ branches:
   - master
 install:
 - go get github.com/urfave/cli
+- go get github.com/stretchr/testify/assert
