@@ -1,19 +1,17 @@
 package gondole
 
-import (
-
-)
+import ()
 
 const (
-    Version = "0.0"
+	Version = "0.0"
 
-    APIEndpoint = "/api/v1"
+	APIEndpoint = "/api/v1"
 )
 
 func NewApp(name, redirectURI string) (g *Gondole, err error) {
-    g = &Gondole{
-        Name: name,
-        RedirectURI: redirectURI,
-    }
-    return
+	g = &Gondole{
+		Name:        name,
+		RedirectURI: redirectURI,
+	}
+	return
 }
