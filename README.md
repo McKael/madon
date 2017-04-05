@@ -25,3 +25,8 @@ The library is fetched, compiled and installed in whichever directory is specifi
 
 Trying to define a name close to *Mastodon*, one could come up with *godon* and in French, *gondole* (the small boats in Venice) is easy to take.
 
+## References
+
+- [Mastodon Ruby API](http://www.rubydoc.info/gems/mastodon-api/Mastodon/REST/API)
+- [Mastodon Python](https://mastodonpy.readthedocs.io/en/latest/)
+- [Mastodon repo](https://github.com/tootsuite/mastodon)
