@@ -20,3 +20,8 @@ Like many Go-based tools, installation is very easy
     go install ./cmd/...
 
 The library is fetched, compiled and installed in whichever directory is specified by `$GOPATH`.  The `atlas` binary will also be installed. 
+
+## Name
+
+Trying to define a name close to *Mastodon*, one could come up with *godon* and in French, *gondole* (the small boats in Venice) is easy to take.
+
