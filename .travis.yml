@@ -1,0 +1,15 @@
+language: go
+go:
+- 1.7
+- 1.8
+- master
+matrix:
+  allow_failures:
+    - go: master
+  fast_finish: true
+branches:
+  only:
+  - develop
+  - master
+install:
+- go get github.com/urfave/cli
