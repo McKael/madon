@@ -5,8 +5,9 @@ import (
 )
 
 type Gondole struct {
-	Name        string
-	RedirectURI string
+	Name   string
+	ID     int64
+	Secret string
 }
 
 type Client struct {
