@@ -10,8 +10,8 @@ func NewApp(name, redirectURI string) (g *Gondole, err error) {
 
 	g = &Gondole{
 		Name:   name,
-		ID:     config.ID,
-		Secret: config.BearerToken,
+		//ID:     config.ID,
+		//Secret: config.BearerToken,
 	}
 	return
 }
