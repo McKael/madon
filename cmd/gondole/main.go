@@ -14,19 +14,28 @@ var (
 func init() {
 }
 
-func main() {
+func Register(c *cli.Context) error {
+
+    return nil
+}
+
+func init() {
     cli.VersionFlag = cli.BoolFlag{Name: "version, V"}
 
     cli.VersionPrinter = func(c *cli.Context) {
-        log.Printf("API wrapper: %s Mastodon CLI: %s\n", c.App.Version, gondole.Version)
+        log.Printf("API wrapper: %s Mastodon CLI: %s\n", c.App.Version, gondole.APIVersion)
     }
+}
 
+func main() {
     app := cli.NewApp()
     app.Name = "gondole"
     app.Usage = "Mastodon CLI interface"
     app.Author = "Ollivier Robert <roberto@keltia.net>"
-    app.Version = gondole.Version
+    app.Version = gondole.APIVersion
     //app.HideVersion = true
+
+    app.Before = Register
 
     app.Flags = []cli.Flag{
         cli.BoolFlag{
