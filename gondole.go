@@ -17,7 +17,6 @@ const (
 // prepareRequest insert all pre-defined stuff
 func (g *Gondole) prepareRequest(what string) (req rest.Request) {
 	endPoint := APIEndpoint + fmt.Sprintf("/%s/", what)
-	key, ok := HasAPIKey()
 
 	// Add at least one option, the APIkey if present
 	hdrs := make(map[string]string)
@@ -25,11 +24,6 @@ func (g *Gondole) prepareRequest(what string) (req rest.Request) {
 
 	// Insert our sig
 	hdrs["User-Agent"] = fmt.Sprintf("Gondole/%s", APIVersion)
-
-	// Insert key
-	if ok {
-		opts["key"] = key
-	}
 
 	req = rest.Request{
 		BaseURL:     endPoint,
