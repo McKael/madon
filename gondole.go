@@ -4,6 +4,7 @@ import ()
 import (
 	"github.com/sendgrid/rest"
 	"fmt"
+	"errors"
 )
 
 const (
@@ -12,6 +13,10 @@ const (
 	APIEndpoint = "/api/v1"
 
 	NoRedirect = "urn:ietf:wg:oauth:2.0:oob"
+)
+
+var (
+	ErrAlreadyRegistered = errors.New("App already registered")
 )
 
 // prepareRequest insert all pre-defined stuff
