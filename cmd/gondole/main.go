@@ -11,9 +11,6 @@ var (
     fVerbose bool
 )
 
-func init() {
-}
-
 func Register(c *cli.Context) error {
 
     return nil
