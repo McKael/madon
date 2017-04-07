@@ -21,6 +21,12 @@ Like many Go-based tools, installation is very easy
 
 The library is fetched, compiled and installed in whichever directory is specified by `$GOPATH`.  The `atlas` binary will also be installed. 
 
+## Configuration
+
+The configuration is stored in the standard place: `$HOME/.config/gondole`.  You can find a global configuration file named `config.toml`and a file for each instance you have connected with, named `<instance>.toml`.
+
+When you connect `gondole` to a given instance you have never connected before, it will register the application, get the token and save it.
+
 ## Name
 
 Trying to define a name close to *Mastodon*, one could come up with *godon* and in French, *gondole* (the small boats in Venice) is easy to take.
