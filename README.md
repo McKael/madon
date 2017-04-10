@@ -19,7 +19,7 @@ Like many Go-based tools, installation is very easy
     git clone https://github.com/keltia/gondole
     go install ./cmd/...
 
-The library is fetched, compiled and installed in whichever directory is specified by `$GOPATH`.  The `atlas` binary will also be installed. 
+The library is fetched, compiled and installed in whichever directory is specified by `$GOPATH`.  The `gondole-cli` binary will also be installed. 
 
 ## Configuration
 
