@@ -1,10 +1,10 @@
 package gondole
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
-	"path/filepath"
 	"os"
+	"path/filepath"
+	"testing"
 )
 
 func TestLoadGlobal(t *testing.T) {
@@ -24,3 +24,26 @@ func TestLoadGlobal(t *testing.T) {
 	assert.EqualValues(t, "foobar", c.Default, "equal")
 }
 
+func TestLoadInstance(t *testing.T) {
+	baseDir = "."
+
+	_, err := loadInstance("nonexistent")
+	assert.Error(t, err, "does not exist")
+
+	real := &Server{
+		ID:          666,
+		Name:        "foo",
+		BearerToken: "d3b07384d113edec49eaa6238ad5ff00",
+	}
+	s, err := loadInstance("test/foo")
+	assert.NoError(t, err, "all fine")
+	assert.Equal(t, real, s, "equal")
+}
+
+func TestGetInstanceList(t *testing.T) {
+	baseDir = "test"
+
+	real := []string{"test/foo.token"}
+	list := GetInstanceList()
+	assert.Equal(t, real, list, "equal")
+}
