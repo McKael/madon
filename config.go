@@ -94,7 +94,7 @@ func GetInstanceList() (list []string) {
 	list, err := filepath.Glob(filepath.Join(baseDir, "*.token"))
 	log.Printf("basedir=%s", filepath.Join(baseDir, "*.token"))
 	if err != nil {
-		log.Printf("warning, no *.token files")
+		log.Printf("warning, no *.token files in %s", baseDir)
 		list = nil
 	}
 	log.Printf("list=%v", list)
