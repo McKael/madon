@@ -57,10 +57,12 @@ func loadGlobal(file string) (c *Config, err error) {
 		return c, fmt.Errorf("Can not read %s", file)
 	}
 
-	err = toml.Unmarshal(buf, c)
+	cnf := Config{}
+	err = toml.Unmarshal(buf, &cnf)
 	if err != nil {
 		return c, fmt.Errorf("Error parsing toml %s: %v", file, err)
 	}
+	c = &cnf
 	return
 }
 
