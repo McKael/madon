@@ -43,18 +43,23 @@ type Config struct {
 }
 
 func loadGlobal(file string) (c *Config, err error) {
+	log.Printf("file=%s", file)
 	// Check if there is any config file
-	if _, err := os.Stat(file); err == nil {
-		// Read it
-		buf, err := ioutil.ReadFile(file)
-		if err != nil {
-			return c, fmt.Errorf("Can not read %s", file)
-		}
+	_, err = os.Stat(file)
+	if err != nil {
+		return
+	}
 
-		err = toml.Unmarshal(buf, c)
-		if err != nil {
-			return c, fmt.Errorf("Error parsing toml %s: %v", file, err)
-		}
+	log.Printf("file=%s, found it", file)
+	// Read it
+	buf, err := ioutil.ReadFile(file)
+	if err != nil {
+		return c, fmt.Errorf("Can not read %s", file)
+	}
+
+	err = toml.Unmarshal(buf, c)
+	if err != nil {
+		return c, fmt.Errorf("Error parsing toml %s: %v", file, err)
 	}
 	return
 }
@@ -62,6 +67,8 @@ func loadGlobal(file string) (c *Config, err error) {
 func loadInstance(name string) (s *Server, err error) {
 	// Load instance-specific file
 	file := filepath.Join(baseDir, name+".token")
+
+	log.Printf("instance is %s", file)
 
 	// Check if there is any config file
 	if _, err := os.Stat(file); err == nil {
@@ -93,6 +100,7 @@ func LoadConfig(name string) (s *Server, err error) {
 	// Load global file
 	gFile := filepath.Join(baseDir, DefaultName)
 
+	log.Printf("global is %s", gFile)
 	c, err := loadGlobal(gFile)
 	if err != nil {
 		return
@@ -113,7 +121,7 @@ func (c *Config) Write() (err error) {
 
 	var sc []byte
 
-	if sc, err = toml.Marshal(c); err != nil {
+	if sc, err = toml.Marshal(*c); err != nil {
 		log.Fatalf("error saving configuration")
 	}
 	err = ioutil.WriteFile(filepath.Join(baseDir, DefaultName), sc, 0600)
