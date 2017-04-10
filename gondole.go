@@ -9,7 +9,7 @@ import (
 const (
 	APIVersion = "0.0"
 
-	APIEndpoint = "/api/v1"
+	APIEndpoint = "https://mastodon.social/api/v1"
 
 	NoRedirect = "urn:ietf:wg:oauth:2.0:oob"
 )
