@@ -46,4 +46,9 @@ func TestGetInstanceList(t *testing.T) {
 	real := []string{"test/foo.token"}
 	list := GetInstanceList()
 	assert.Equal(t, real, list, "equal")
+
+	baseDir = "/tmp"
+	real = nil
+	list = GetInstanceList()
+	assert.Equal(t, real, list, "equal")
 }
