@@ -80,10 +80,13 @@ func loadInstance(name string) (s *Server, err error) {
 			return s, fmt.Errorf("Can not read %s", file)
 		}
 
-		err = toml.Unmarshal(buf, s)
+		var sc Server
+
+		err = toml.Unmarshal(buf, &sc)
 		if err != nil {
 			return s, fmt.Errorf("Error parsing toml %s: %v", file, err)
 		}
+		s = &sc
 	}
 	return
 }
