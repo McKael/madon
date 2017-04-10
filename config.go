@@ -73,7 +73,7 @@ func loadInstance(name string) (s *Server, err error) {
 	log.Printf("instance is %s", file)
 
 	// Check if there is any config file
-	if _, err := os.Stat(file); err == nil {
+	if _, err = os.Stat(file); err == nil {
 		// Read it
 		buf, err := ioutil.ReadFile(file)
 		if err != nil {
