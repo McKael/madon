@@ -13,6 +13,9 @@ func TestLoadGlobal(t *testing.T) {
 	_, err := loadGlobal(filepath.Join("test", "non.toml"))
 	assert.Error(t, err, "does not exist")
 
+	_, err = loadGlobal(filepath.Join("test", "garbage.token"))
+	assert.Error(t, err, "just garbage")
+
 	// git does now allow you to checkin 000 files :(
 	err = os.Chmod(filepath.Join("test", "perms.toml"), 000)
 	_, err = loadGlobal(filepath.Join("test", "perms.toml"))
@@ -43,11 +46,16 @@ func TestLoadInstance(t *testing.T) {
 func TestGetInstanceList(t *testing.T) {
 	baseDir = "test"
 
-	real := []string{"test/foo.token"}
+	real := []string{"test/foo.token", "test/garbage.token"}
 	list := GetInstanceList()
 	assert.Equal(t, real, list, "equal")
 
 	baseDir = "/tmp"
+	real = nil
+	list = GetInstanceList()
+	assert.Equal(t, real, list, "equal")
+
+	baseDir = "/nonexistent"
 	real = nil
 	list = GetInstanceList()
 	assert.Equal(t, real, list, "equal")
