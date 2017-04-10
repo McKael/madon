@@ -91,11 +91,13 @@ func loadInstance(name string) (s *Server, err error) {
 }
 
 func GetInstanceList() (list []string) {
-	list, err := filepath.Glob(filepath.Join(baseDir + "*.token"))
+	list, err := filepath.Glob(filepath.Join(baseDir, "*.token"))
+	log.Printf("basedir=%s", filepath.Join(baseDir, "*.token"))
 	if err != nil {
 		log.Printf("warning, no *.token files")
 		list = nil
 	}
+	log.Printf("list=%v", list)
 	return
 }
 
