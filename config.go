@@ -36,6 +36,7 @@ type Server struct {
 	ID          string
 	Name        string
 	BearerToken string
+	BaseURL     string		// This allow for overriding the APIEndpoint on registration
 }
 
 type Config struct {

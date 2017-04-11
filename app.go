@@ -21,7 +21,7 @@ type registerApp struct {
 	ClientSecret string `json:"client_secret"`
 }
 
-func registerApplication(name string, scopes []string, redirectURI string) (g *Gondole, err error) {
+func registerApplication(name string, scopes []string, redirectURI, baseURL string) (g *Gondole, err error) {
 	g = &Gondole{
 		Name: name,
 	}
@@ -54,6 +54,7 @@ func registerApplication(name string, scopes []string, redirectURI string) (g *G
 		ID:          g.ID,
 		Name:        name,
 		BearerToken: g.Secret,
+		BaseURL:     baseURL,
 	}
 	err = server.WriteToken(name)
 	if err != nil {
@@ -63,7 +64,12 @@ func registerApplication(name string, scopes []string, redirectURI string) (g *G
 }
 
 // NewApp registers a new instance
-func NewApp(name string, scopes []string, redirectURI string) (g *Gondole, err error) {
+func NewApp(name string, scopes []string, redirectURI, baseURL  string) (g *Gondole, err error) {
+
+	if baseURL != "" {
+		APIEndpoint = baseURL
+	}
+
 	// Load configuration, will register if none is found
 	cnf, err := LoadConfig(name)
 	if err != nil {
@@ -81,7 +87,7 @@ func NewApp(name string, scopes []string, redirectURI string) (g *Gondole, err e
 			scopes = ourScopes
 		}
 
-		g, err = registerApplication(name, scopes, redirectURI)
+		g, err = registerApplication(name, scopes, redirectURI, baseURL)
 
 	} else {
 		g = &Gondole{

@@ -9,13 +9,13 @@ import (
 
 var (
 	fVerbose bool
+	fBaseURL string
     instance *gondole.Gondole
 	cnf      *gondole.Config
 )
 
 func Register(c *cli.Context) (err error) {
-
-    instance, err = gondole.NewApp("gondole-cli", nil, gondole.NoRedirect)
+    instance, err = gondole.NewApp("gondole-cli", nil, gondole.NoRedirect, fBaseURL)
 	return err
 }
 
@@ -43,6 +43,11 @@ func main() {
 			Name:        "verbose,v",
 			Usage:       "verbose mode",
 			Destination: &fVerbose,
+		},
+		cli.StringFlag{
+			Name:        "instance,i",
+			Usage:       "use that instance",
+			Destination: &fBaseURL,
 		},
 	}
 	app.Run(os.Args)

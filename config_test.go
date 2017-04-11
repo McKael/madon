@@ -55,6 +55,7 @@ func TestLoadInstance(t *testing.T) {
 		ID:          "666",
 		Name:        "foo",
 		BearerToken: "d3b07384d113edec49eaa6238ad5ff00",
+		BaseURL:     "https://mastodon.social",
 	}
 	file = filepath.Join("test", "foo")
 	s, err := loadInstance(file)
