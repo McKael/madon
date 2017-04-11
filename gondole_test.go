@@ -6,7 +6,7 @@ import (
 )
 
 func TestPrepareRequest(t *testing.T) {
-    g, err := NewApp("foo", nil, NoRedirect)
+    g, err := NewApp("foo", nil, NoRedirect, "")
     assert.NoError(t, err, "no error")
 
     req := g.prepareRequest("bar")

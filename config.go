@@ -33,10 +33,10 @@ var (
 
 // Config holds our parameters
 type Server struct {
-	ID          string
-	Name        string
-	BearerToken string
-	BaseURL     string		// This allow for overriding the APIEndpoint on registration
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	BearerToken string `json:"bearer_token"`
+	BaseURL     string `json:"base_url"`	// Allow for overriding APIEndpoint on registration
 }
 
 type Config struct {
