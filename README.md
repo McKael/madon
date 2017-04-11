@@ -12,7 +12,7 @@ Go version of the Mastodon API
 
 Like many Go-based tools, installation is very easy
   
-    go get github.com/keltia/gondole
+    go get github.com/keltia/gondole/cmd/...
 
   or
   
