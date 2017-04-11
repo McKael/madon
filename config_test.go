@@ -52,7 +52,7 @@ func TestLoadInstance(t *testing.T) {
 	assert.NoError(t, err, "should be fine")
 
 	real := &Server{
-		ID:          666,
+		ID:          "666",
 		Name:        "foo",
 		BearerToken: "d3b07384d113edec49eaa6238ad5ff00",
 	}

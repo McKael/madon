@@ -16,8 +16,8 @@ var (
 )
 
 type registerApp struct {
-	ID           int64  `json:"id"`
-	ClientID     int64  `json:"client_id"`
+	ID           string `json:"id"`
+	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 }
 

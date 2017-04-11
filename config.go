@@ -33,7 +33,7 @@ var (
 
 // Config holds our parameters
 type Server struct {
-	ID          int64
+	ID          string
 	Name        string
 	BearerToken string
 }

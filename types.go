@@ -6,7 +6,7 @@ import (
 
 type Gondole struct {
 	Name   string
-	ID     int64
+	ID     string
 	Secret string
 }
 
@@ -23,7 +23,7 @@ Everything manipulated/returned by the API
 */
 
 type Account struct {
-	ID          int64
+	ID          string
 	Username    string
 	Acct        string
 	DisplayName string
@@ -43,7 +43,7 @@ type Application struct {
 }
 
 type Attachement struct {
-	ID         int64
+	ID         string
 	Type       string
 	URL        string
 	RemoteURL  string
@@ -75,14 +75,14 @@ type Instance struct {
 }
 
 type Mention struct {
-	ID       int64
+	ID       string
 	URL      string
 	Username string
 	Acct     string
 }
 
 type Notification struct {
-	ID        int64
+	ID        string
 	Type      string
 	CreatedAt time.Time
 	Account   *Account
@@ -108,12 +108,12 @@ type Result struct {
 }
 
 type Status struct {
-	ID                 int64
+	ID                 string
 	URI                string
 	URL                string
 	Account            *Account
-	InReplyToId        int64
-	InReplyToAccountID int64
+	InReplyToId        string
+	InReplyToAccountID string
 	Reblog             *Status
 	Content            string
 	CreatedAT          time.Time
