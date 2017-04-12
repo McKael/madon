@@ -18,7 +18,6 @@ func (g *Client) GetNotifications() ([]Notification, error) {
 		return notifications, fmt.Errorf("notifications API query: %s", err.Error())
 	}
 
-	println(r.Body)
 	err = json.Unmarshal([]byte(r.Body), &notifications)
 	if err != nil {
 		var res struct {
@@ -44,7 +43,6 @@ func (g *Client) GetNotification(id int) (*Notification, error) {
 		return &notification, fmt.Errorf("notification API query: %s", err.Error())
 	}
 
-	println(r.Body)
 	err = json.Unmarshal([]byte(r.Body), &notification)
 	if err != nil {
 		var res struct {
@@ -58,4 +56,17 @@ func (g *Client) GetNotification(id int) (*Notification, error) {
 	}
 
 	return &notification, nil
+}
+
+// ClearNotifications deletes all notifications from the Mastodon server for
+// the authenticated user
+func (g *Client) ClearNotifications() error {
+	req := g.prepareRequest("notifications/clear")
+	req.Method = rest.Post
+	r, err := rest.API(req)
+	if err != nil {
+		return notifications, fmt.Errorf("notifications/clear API query: %s", err.Error())
+	}
+
+	return nil // TODO: check returned object (should be empty)
 }
