@@ -32,8 +32,9 @@ func NewApp(name string, scopes []string, redirectURI, instanceURL string) (g *C
 	}
 
 	g = &Client{
-		Name:    name,
-		APIBase: apiPath,
+		Name:        name,
+		APIBase:     apiPath,
+		InstanceURL: instanceURL,
 	}
 
 	req := g.prepareRequest("apps")
@@ -56,10 +57,6 @@ func NewApp(name string, scopes []string, redirectURI, instanceURL string) (g *C
 	err = json.Unmarshal([]byte(r.Body), &resp)
 	if err != nil {
 		log.Fatalf("error can not register app: %v", err)
-	}
-
-	if err != nil {
-		log.Fatalf("error: can not write token for %s", name)
 	}
 
 	g.ID = resp.ClientID

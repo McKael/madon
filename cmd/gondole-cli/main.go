@@ -26,7 +26,7 @@ var (
 	defaultInstanceURL = "https://mastodon.social"
 )
 
-// Config holds our parameters
+// Server holds our application details
 type Server struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
