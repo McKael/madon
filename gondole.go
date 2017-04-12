@@ -9,7 +9,11 @@ import (
 const (
 	APIVersion = "0.0"
 
-	defAPIEndpoint = "https://mastodon.social/api/v1"
+	// That is not overridable
+	apiURL = "/api/v1"
+
+	// Fallback instance
+	FallBackURL = "https://mastodon.social"
 
 	NoRedirect = "urn:ietf:wg:oauth:2.0:oob"
 )
@@ -20,27 +24,28 @@ var (
 )
 
 // prepareRequest insert all pre-defined stuff
-func (g *Gondole) prepareRequest(what string) (req rest.Request) {
-	var endPoint string
+func (g *Client) prepareRequest(what string) (req rest.Request) {
+	var APIBase string
 
 	// Allow for overriding for registration
-	if APIEndpoint == "" {
-		endPoint = defAPIEndpoint
+	if g.APIBase == "" {
+		APIBase = FallBackURL
 	} else {
-		endPoint = APIEndpoint
+		APIBase = g.APIBase
 	}
 
-	endPoint = endPoint + fmt.Sprintf("/%s", what)
+	APIEndpoint = fmt.Sprintf("%s%s/%", APIBase, apiURL, what)
+
 	// Add at least one option, the APIkey if present
 	hdrs := make(map[string]string)
 	opts := make(map[string]string)
 
 	// Insert our sig
-	hdrs["User-Agent"] = fmt.Sprintf("Gondole/%s", APIVersion)
+	hdrs["User-Agent"] = fmt.Sprintf("Client/%s", APIVersion)
 	hdrs["Authorization"] = fmt.Sprintf("Bearer %s", g.Secret)
 
 	req = rest.Request{
-		BaseURL:     endPoint,
+		BaseURL:     APIEndpoint,
 		Headers:     hdrs,
 		QueryParams: opts,
 	}
