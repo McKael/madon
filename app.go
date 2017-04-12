@@ -7,13 +7,7 @@ import (
 	"strings"
 )
 
-var (
-	ourScopes = []string{
-		"read",
-		"write",
-		"follow",
-	}
-)
+var ()
 
 type registerApp struct {
 	ID           string `json:"id"`
@@ -21,9 +15,17 @@ type registerApp struct {
 	ClientSecret string `json:"client_secret"`
 }
 
-func registerApplication(name string, scopes []string, redirectURI, baseURL string) (g *Gondole, err error) {
-	g = &Gondole{
+// NewApp registers a new instance
+func NewApp(name string, scopes []string, redirectURI, baseURL string) (g *Client, err error) {
+	var endpoint string
+
+	if baseURL != "" {
+		endpoint = baseURL
+	}
+
+	g = &Client{
 		Name: name,
+		APIBase: endpoint,
 	}
 
 	req := g.prepareRequest("apps")
@@ -47,54 +49,16 @@ func registerApplication(name string, scopes []string, redirectURI, baseURL stri
 	if err != nil {
 		log.Fatalf("error can not register app: %v", err)
 	}
-	g.ID = resp.ClientID
-	g.Secret = resp.ClientSecret
 
-	server := &Server{
-		ID:          g.ID,
-		Name:        name,
-		BearerToken: g.Secret,
-		BaseURL:     baseURL,
-	}
-	err = server.WriteToken(name)
 	if err != nil {
 		log.Fatalf("error: can not write token for %s", name)
 	}
-	return
-}
 
-// NewApp registers a new instance
-func NewApp(name string, scopes []string, redirectURI, baseURL  string) (g *Gondole, err error) {
-
-	if baseURL != "" {
-		APIEndpoint = baseURL
-	}
-
-	// Load configuration, will register if none is found
-	cnf, err := LoadConfig(name)
-	if err != nil {
-		// Nothing exist yet
-		cnf := Config{
-			Default: name,
-		}
-		err = cnf.Write()
-		if err != nil {
-			log.Fatalf("error: can not write config for %s", name)
-		}
-
-		// Now register this through OAuth
-		if scopes == nil {
-			scopes = ourScopes
-		}
-
-		g, err = registerApplication(name, scopes, redirectURI, baseURL)
-
-	} else {
-		g = &Gondole{
-			Name:   cnf.Name,
-			ID:     cnf.ID,
-			Secret: cnf.BearerToken,
-		}
+	g = &Client{
+		Name:    name,
+		ID:      resp.ClientID,
+		Secret:  resp.ClientSecret,
+		APIBase: endpoint,
 	}
 
 	return
