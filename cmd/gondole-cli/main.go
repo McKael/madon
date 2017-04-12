@@ -16,19 +16,14 @@ var (
 	instance *gondole.Client
 	cnf      *Server
 
-	// For bootstrapping, override the API endpoint w/o any possible /api/vN, that is
-	// supplied by the library
-	APIEndpoint string
-
-	// Deduced though the full instance URL when registering
-	InstanceName string
-
 	// Default scopes
 	ourScopes = []string{
 		"read",
 		"write",
 		"follow",
 	}
+
+	defaultInstanceURL = "https://mastodon.social"
 )
 
 // Config holds our parameters
@@ -36,7 +31,8 @@ type Server struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
 	BearerToken string `json:"bearer_token"`
-	BaseURL     string `json:"base_url"` // Allow for overriding APIEndpoint on registration
+	APIBase     string `json:"base_url"`
+	InstanceURL string `json:"base_url"`
 }
 
 type Config struct {
@@ -46,21 +42,27 @@ type Config struct {
 func setupEnvironment(c *cli.Context) (err error) {
 	var scopes []string
 
+	instanceURL := defaultInstanceURL
 	if fInstance != "" {
-		InstanceName = basename(fInstance)
-		APIEndpoint = filterURL(fInstance)
+		if strings.Contains(fInstance, "://") {
+			instanceURL = fInstance
+		} else {
+			instanceURL = "https://" + fInstance
+		}
 	}
 
+	instanceName := basename(instanceURL)
+
 	// Load configuration, will register if none is found
-	cnf, err = LoadConfig(InstanceName)
+	cnf, err = LoadConfig(instanceName)
 	if err != nil {
 		// Nothing exist yet
 		defName := Config{
-			Default: InstanceName,
+			Default: instanceName,
 		}
 		err = defName.Write()
 		if err != nil {
-			log.Fatalf("error: can not write config for %s", InstanceName)
+			log.Fatalf("error: can not write config for %s", instanceName)
 		}
 
 		// Now register this through OAuth
@@ -70,15 +72,16 @@ func setupEnvironment(c *cli.Context) (err error) {
 			scopes = ourScopes
 		}
 
-		instance, err = gondole.NewApp("gondole-cli", scopes, gondole.NoRedirect, fInstance)
+		instance, err = gondole.NewApp("gondole-cli", scopes, gondole.NoRedirect, instanceURL)
 
 		server := &Server{
 			ID:          instance.ID,
 			Name:        instance.Name,
 			BearerToken: instance.Secret,
-			BaseURL:     instance.APIBase,
+			APIBase:     instance.APIBase,
+			InstanceURL: instance.InstanceURL,
 		}
-		err = server.WriteToken(InstanceName)
+		err = server.WriteToken(instanceName)
 		if err != nil {
 			log.Fatalf("error: can not write token for %s", instance.Name)
 		}
@@ -101,7 +104,7 @@ func init() {
 	cli.VersionFlag = cli.BoolFlag{Name: "version, V"}
 
 	cli.VersionPrinter = func(c *cli.Context) {
-		log.Printf("API wrapper: %s Mastodon CLI: %s\n", c.App.Version, gondole.APIVersion)
+		log.Printf("API wrapper: %s Mastodon CLI: %s\n", c.App.Version, gondole.GondoleVersion)
 	}
 }
 
@@ -111,7 +114,7 @@ func main() {
 	app.Name = "gondole"
 	app.Usage = "Mastodon CLI interface"
 	app.Author = "Ollivier Robert <roberto@keltia.net>"
-	app.Version = gondole.APIVersion
+	app.Version = gondole.GondoleVersion
 	//app.HideVersion = true
 
 	app.Before = setupEnvironment

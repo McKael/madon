@@ -2,30 +2,38 @@ package gondole
 
 import (
 	"encoding/json"
-	"github.com/sendgrid/rest"
 	"log"
+	"net/url"
 	"strings"
+
+	"github.com/sendgrid/rest"
 )
 
-var ()
-
 type registerApp struct {
-	ID           string `json:"id"`
+	ID           int    `json:"id"`
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 }
 
 // NewApp registers a new instance
-func NewApp(name string, scopes []string, redirectURI, baseURL string) (g *Client, err error) {
-	var endpoint string
+func NewApp(name string, scopes []string, redirectURI, instanceURL string) (g *Client, err error) {
+	if instanceURL == "" {
+		instanceURL = defaultInstanceURL
+	}
 
-	if baseURL != "" {
-		endpoint = baseURL
+	if !strings.Contains(instanceURL, "://") {
+		instanceURL = "https://" + instanceURL
+	}
+
+	apiPath := instanceURL + defaultAPIPath
+
+	if _, err := url.ParseRequestURI(apiPath); err != nil {
+		return nil, err
 	}
 
 	g = &Client{
-		Name: name,
-		APIBase: endpoint,
+		Name:    name,
+		APIBase: apiPath,
 	}
 
 	req := g.prepareRequest("apps")
@@ -54,12 +62,8 @@ func NewApp(name string, scopes []string, redirectURI, baseURL string) (g *Clien
 		log.Fatalf("error: can not write token for %s", name)
 	}
 
-	g = &Client{
-		Name:    name,
-		ID:      resp.ClientID,
-		Secret:  resp.ClientSecret,
-		APIBase: endpoint,
-	}
+	g.ID = resp.ClientID
+	g.Secret = resp.ClientSecret
 
 	return
 }

@@ -4,11 +4,13 @@ import (
 	"time"
 )
 
+// Client contains data for a gondole client application
 type Client struct {
-	Name    string
-	ID      string
-	Secret  string
-	APIBase string
+	Name        string
+	ID          string
+	Secret      string
+	APIBase     string
+	InstanceURL string
 }
 
 /*
