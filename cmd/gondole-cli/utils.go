@@ -18,10 +18,8 @@ func filterURL(in string) (out string) {
     if err != nil {
         out = ""
     } else {
-        out = url.URL{
-            Scheme: uri.Scheme,
-            Host: uri.Host,
-        }.String()
+        uri := url.URL{Scheme: uri.Scheme, Host: uri.Host}
+        out = uri.String()
     }
     return
 }
