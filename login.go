@@ -14,7 +14,7 @@ type UserToken struct {
 	TokenType    string `json:"token_type"`
 }
 
-func (g *Client) Login(username, password string) error {
+func (g *Client) LoginBasic(username, password string) error {
 	if username == "" {
 		return fmt.Errorf("missing username")
 	}

@@ -13,6 +13,7 @@ import (
 var (
 	fVerbose             bool
 	fInstance            string
+	fAuthMethod          string
 	fUsername, fPassword string
 	fScopes              string
 
@@ -27,6 +28,11 @@ var (
 	}
 
 	defaultInstanceURL = "https://mastodon.social"
+
+	authMethods = map[string]bool{
+		"basic":  true,
+		"oauth2": true,
+	}
 )
 
 // Server holds our application details
@@ -40,9 +46,17 @@ type Server struct {
 
 type Config struct {
 	Default string
+
+	// Can be "oauth2", "basic"
+	Auth string
+
+	// If not using OAuth2
+	User     string
+	Password string
 }
 
 func setupEnvironment(c *cli.Context) (err error) {
+	var config Config
 	var scopes []string
 
 	instanceURL := defaultInstanceURL
@@ -56,14 +70,24 @@ func setupEnvironment(c *cli.Context) (err error) {
 
 	instanceName := basename(instanceURL)
 
+	if fAuthMethod != "" && authMethods[fAuthMethod] {
+
+	}
+
 	// Load configuration, will register if none is found
 	cnf, err = LoadConfig(instanceName)
 	if err != nil {
 		// Nothing exist yet
-		defName := Config{
-			Default: instanceName,
-		}
-		err = defName.Write()
+		/*
+			defName := Config{
+				Default:  instanceName,
+				Auth:     "basic",
+				User:     "",
+				Password: "",
+			}
+		*/
+
+		err = config.Write()
 		if err != nil {
 			log.Fatalf("error: can not write config for %s", instanceName)
 		}
@@ -99,7 +123,12 @@ func setupEnvironment(c *cli.Context) (err error) {
 		}
 
 	}
+
 	// Log in to the instance
+	if fAuthMethod == "basic" {
+		err = instance.LoginBasic(fUsername, fPassword)
+	}
+
 	return err
 }
 
@@ -123,10 +152,10 @@ func main() {
 	app.Before = setupEnvironment
 
 	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:        "verbose,v",
-			Usage:       "verbose mode",
-			Destination: &fVerbose,
+		cli.StringFlag{
+			Name:        "auth,A",
+			Usage:       "authentication mode",
+			Destination: &fAuthMethod,
 		},
 		cli.StringFlag{
 			Name:        "instance,I",
@@ -147,6 +176,11 @@ func main() {
 			Name:        "password",
 			Usage:       "user password",
 			Destination: &fPassword,
+		},
+		cli.BoolFlag{
+			Name:        "verbose,v",
+			Usage:       "verbose mode",
+			Destination: &fVerbose,
 		},
 	}
 	app.Run(os.Args)
