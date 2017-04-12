@@ -76,7 +76,15 @@ func setupEnvironment(c *cli.Context) (err error) {
 
 	// Load configuration, will register if none is found
 	cnf, err = LoadConfig(instanceName)
-	if err != nil {
+	if err == nil && cnf != nil {
+		instance = &gondole.Client{
+			ID:          cnf.ID,
+			InstanceURL: cnf.InstanceURL,
+			APIBase:     cnf.APIBase,
+			Name:        cnf.Name,
+			Secret:      cnf.BearerToken,
+		}
+	} else {
 		// Nothing exist yet
 		/*
 			defName := Config{
