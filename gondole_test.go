@@ -6,8 +6,12 @@ import (
 )
 
 func TestPrepareRequest(t *testing.T) {
-    g, err := NewApp("foo", nil, NoRedirect, "")
-    assert.NoError(t, err, "no error")
+    g := &Client{
+        Name: "foo",
+        ID: "666",
+        Secret: "biiiip",
+        APIBase: "http://example.com",
+    }
 
     req := g.prepareRequest("bar")
     assert.NotNil(t, req.Headers, "not nil")

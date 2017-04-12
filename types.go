@@ -4,133 +4,146 @@ import (
 	"time"
 )
 
-type Gondole struct {
-	Name   string
-	ID     string
-	Secret string
-}
-
 type Client struct {
-	BaseURL     string
-	BearerToken string
+	Name    string
+	ID      string
+	Secret  string
+	APIBase string
 }
 
 /*
-
 Entities:
 
 Everything manipulated/returned by the API
 */
 
+// Account represents a Mastodon account entity
 type Account struct {
-	ID          string
-	Username    string
-	Acct        string
-	DisplayName string
-	Note        string
-	URL         string
-	Avatar      string
-	Header      string
-	Locked      bool
-	Followers   int
-	Followings  int
-	Statuses    int
+	ID             int    `json:"id"`
+	Username       string `json:"username"`
+	Acct           string `json:"acct"`
+	DisplayName    string `json:"display_name"`
+	Note           string `json:"note"`
+	URL            string `json:"url"`
+	Avatar         string `json:"avatar"`
+	Header         string `json:"header"`
+	Locked         bool   `json:"locked"`
+	CreatedAt      string `json:"created_at"`
+	FollowersCount int    `json:"followers_count"`
+	FollowingCount int    `json:"following_count"`
+	StatusesCount  int    `json:"statuses_count"`
 }
 
+// Application represents a Mastodon application entity
 type Application struct {
-	Name    string
-	Website string
+	Name    string `json:"name"`
+	Website string `json:"website"`
 }
 
-type Attachement struct {
-	ID         string
-	Type       string
-	URL        string
-	RemoteURL  string
-	PreviewURL string
-	TextURL    string
+// Attachment represents a Mastodon attachement entity
+type Attachment struct {
+	ID         int    `json:"iD"`
+	Type       string `json:"type"`
+	URL        string `json:"url"`
+	RemoteURL  string `json:"remote_url"`
+	PreviewURL string `json:"preview_url"`
+	TextURL    string `json:"text_url"`
 }
 
+/*
+// Card represents a Mastodon card entity
 type Card struct {
-	URL         string
-	Title       string
-	Description string
-	Image       string
+	URL         string       `json:"url"`
+	Title       string       `json:"title"`
+	Description string       `json:"description"`
+	Image       *interface{} `json:"image"`
 }
+*/
 
+// Context represents a Mastodon context entity
 type Context struct {
-	Ancestors   []Status
-	Descendents []Status
+	Ancestors   []Status `json:"ancestors"`
+	Descendents []Status `json:"descendents"`
 }
 
+// Error represents a Mastodon error entity
 type Error struct {
-	Text string
+	Text string `json:"error"`
 }
 
+// Instance represents a Mastodon instance entity
 type Instance struct {
-	URI         string
-	Title       string
-	Description string
-	Email       string
+	URI         string `json:"uri"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Email       string `json:"email"`
 }
 
+// Mention represents a Mastodon mention entity
 type Mention struct {
-	ID       string
-	URL      string
-	Username string
-	Acct     string
+	ID       int    `json:"id"`
+	URL      string `json:"url"`
+	Username string `json:"username"`
+	Acct     string `json:"acct"`
 }
 
+// Notification represents a Mastodon notification entity
 type Notification struct {
-	ID        string
-	Type      string
-	CreatedAt time.Time
-	Account   *Account
-	Status    *Status
+	ID        int      `json:"id"`
+	Type      string   `json:"type"`
+	CreatedAt string   `json:"created_at"`
+	Account   *Account `json:"account"`
+	Status    *Status  `json:"status"`
 }
 
+// Relationship represents a Mastodon relationship entity
 type Relationship struct {
-	Following  bool
-	FollowedBy bool
-	Blocking   bool
-	Muting     bool
-	Requested  bool
+	Following  bool `json:"following"`
+	FollowedBy bool `json:"followed_by"`
+	Blocking   bool `json:"blocking"`
+	Muting     bool `json:"muting"`
+	Requested  bool `json:"requested"`
 }
+
+// Report represents a Mastodon report entity
 type Report struct {
-	ID          int64
-	ActionTaken string
+	ID          int    `json:"iD"`
+	ActionTaken string `json:"action_taken"`
 }
 
-type Result struct {
-	Accounts []Account
-	Statutes []Status
-	Hashtags []Tag
+// Results represents a Mastodon results entity
+type Results struct {
+	Accounts []Account `json:"accounts"`
+	Statuses []Status  `json:"statuses"`
+	Hashtags []string  `json:"hashtags"`
 }
 
+// Status represents a Mastodon status entity
 type Status struct {
-	ID                 string
-	URI                string
-	URL                string
-	Account            *Account
-	InReplyToId        string
-	InReplyToAccountID string
-	Reblog             *Status
-	Content            string
-	CreatedAT          time.Time
-	Reblogs            int
-	Favourites         int
-	Reblogged          bool
-	Favourited         bool
-	Sensitive          bool
-	SpoilerText        string
-	Visibility         string
-	MediaAttachments   []Attachement
-	Mentions           []Mention
-	Tags               []Tag
-	App                Application
+	ID                 int          `json:"id"`
+	URI                string       `json:"uri"`
+	URL                string       `json:"url"`
+	Account            *Account     `json:"account"`
+	InReplyToID        int          `json:"in_reply_to_id"`
+	InReplyToAccountID int          `json:"in_reply_to_account_id"`
+	Reblog             *Status      `json:"reblog"`
+	Content            string       `json:"content"`
+	CreatedAt          time.Time    `json:"created_at"`
+	ReblogsCount       int          `json:"reblogs_count"`
+	FavouritesCount    int          `json:"favourites_count"`
+	Reblogged          bool         `json:"reblogged"`
+	Favourited         bool         `json:"favourited"`
+	Sensitive          bool         `json:"sensitive"`
+	SpoilerText        string       `json:"spoiler_text"`
+	Visibility         string       `json:"visibility"`
+	MediaAttachments   []Attachment `json:"media_attachments"`
+	Mentions           []Mention    `json:"mentions"`
+	Tags               []Tag        `json:"tags"`
+	Application        Application  `json:"application"`
 }
 
+// Tag represents a Mastodon tag entity
 type Tag struct {
-	Name string
-	URL  string
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
