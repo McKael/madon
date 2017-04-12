@@ -51,3 +51,7 @@ func (g *Client) prepareRequest(what string) (req rest.Request) {
 	}
 	return
 }
+
+func (g *Client) Login() (err error) {
+	return
+}

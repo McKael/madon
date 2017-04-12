@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	fVerbose  bool
-	fInstance string
-	fScopes   string
+	fVerbose    bool
+	fAuthMethod string
+	fInstance   string
+	fScopes     string
 
 	instance *gondole.Client
 	cnf      *Server
@@ -29,6 +30,11 @@ var (
 		"write",
 		"follow",
 	}
+
+	authMethods = map[string]bool{
+		"basic":  true,
+		"oauth2": true,
+	}
 )
 
 // Config holds our parameters
@@ -41,9 +47,17 @@ type Server struct {
 
 type Config struct {
 	Default string
+
+	// Can be "oauth2", "basic"
+	Auth string
+
+	// If not using OAuth2
+	User     string
+	Password string
 }
 
 func setupEnvironment(c *cli.Context) (err error) {
+	var config Config
 	var scopes []string
 
 	if fInstance != "" {
@@ -51,14 +65,22 @@ func setupEnvironment(c *cli.Context) (err error) {
 		APIEndpoint = filterURL(fInstance)
 	}
 
+	if fAuthMethod != "" && authMethods[fAuthMethod] {
+
+	}
+
 	// Load configuration, will register if none is found
 	cnf, err = LoadConfig(InstanceName)
 	if err != nil {
 		// Nothing exist yet
-		defName := Config{
-			Default: InstanceName,
+		config := Config{
+			Default:  InstanceName,
+			Auth:     "basic",
+			User:     "",
+			Password: "",
 		}
-		err = defName.Write()
+
+		err = config.Write()
 		if err != nil {
 			log.Fatalf("error: can not write config for %s", InstanceName)
 		}
@@ -94,6 +116,8 @@ func setupEnvironment(c *cli.Context) (err error) {
 
 	}
 	// Log in to the instance
+	err = instance.Login()
+
 	return err
 }
 
@@ -117,10 +141,10 @@ func main() {
 	app.Before = setupEnvironment
 
 	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:        "verbose,v",
-			Usage:       "verbose mode",
-			Destination: &fVerbose,
+		cli.StringFlag{
+			Name:        "auth,A",
+			Usage:       "authentication mode",
+			Destination: &fAuthMethod,
 		},
 		cli.StringFlag{
 			Name:        "instance,I",
@@ -131,6 +155,11 @@ func main() {
 			Name:        "scopes,S",
 			Usage:       "use these scopes",
 			Destination: &fScopes,
+		},
+		cli.BoolFlag{
+			Name:        "verbose,v",
+			Usage:       "verbose mode",
+			Destination: &fVerbose,
 		},
 	}
 	app.Run(os.Args)
