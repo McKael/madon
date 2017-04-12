@@ -7,7 +7,7 @@ import (
 
 	"github.com/urfave/cli"
 
-	"github.com/keltia/gondole"
+	"github.com/McKael/gondole"
 )
 
 var (
