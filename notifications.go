@@ -63,9 +63,9 @@ func (g *Client) GetNotification(id int) (*Notification, error) {
 func (g *Client) ClearNotifications() error {
 	req := g.prepareRequest("notifications/clear")
 	req.Method = rest.Post
-	r, err := rest.API(req)
+	_, err := rest.API(req)
 	if err != nil {
-		return notifications, fmt.Errorf("notifications/clear API query: %s", err.Error())
+		return fmt.Errorf("notifications/clear API query: %s", err.Error())
 	}
 
 	return nil // TODO: check returned object (should be empty)
