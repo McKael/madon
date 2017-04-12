@@ -4,16 +4,11 @@ import (
 	"time"
 )
 
-type Gondole struct {
+type Client struct {
 	Name    string
 	ID      string
 	Secret  string
 	APIBase string
-}
-
-type Client struct {
-	BaseURL     string
-	BearerToken string
 }
 
 /*
