@@ -133,7 +133,7 @@ func setupEnvironment(c *cli.Context) (err error) {
 	}
 
 	// Log in to the instance
-	if fAuthMethod == "basic" {
+	if fAuthMethod != "oauth2" {
 		err = instance.LoginBasic(fUsername, fPassword)
 	}
 
