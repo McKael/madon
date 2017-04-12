@@ -20,12 +20,10 @@ func (g *Client) GetNotifications() ([]Notification, error) {
 
 	err = json.Unmarshal([]byte(r.Body), &notifications)
 	if err != nil {
-		var res struct {
-			Error string `json:"error"`
-		}
-		err2 := json.Unmarshal([]byte(r.Body), &res)
+		var errorRes Error
+		err2 := json.Unmarshal([]byte(r.Body), &errorRes)
 		if err2 == nil {
-			return notifications, fmt.Errorf("%s", res.Error)
+			return notifications, fmt.Errorf("%s", errorRes.Text)
 		}
 		return notifications, fmt.Errorf("notifications API: %s", err.Error())
 	}
@@ -45,12 +43,10 @@ func (g *Client) GetNotification(id int) (*Notification, error) {
 
 	err = json.Unmarshal([]byte(r.Body), &notification)
 	if err != nil {
-		var res struct {
-			Error string `json:"error"`
-		}
-		err2 := json.Unmarshal([]byte(r.Body), &res)
+		var errorRes Error
+		err2 := json.Unmarshal([]byte(r.Body), &errorRes)
 		if err2 == nil {
-			return &notification, fmt.Errorf("%s", res.Error)
+			return &notification, fmt.Errorf("%s", errorRes.Text)
 		}
 		return &notification, fmt.Errorf("notification API: %s", err.Error())
 	}

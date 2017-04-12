@@ -34,12 +34,10 @@ func (g *Client) GetTimelines(timeline string) ([]Status, error) {
 
 	err = json.Unmarshal([]byte(r.Body), &tl)
 	if err != nil {
-		var res struct {
-			Error string `json:"error"`
-		}
-		err2 := json.Unmarshal([]byte(r.Body), &res)
+		var errorRes Error
+		err2 := json.Unmarshal([]byte(r.Body), &errorRes)
 		if err2 == nil {
-			return tl, fmt.Errorf("%s", res.Error)
+			return tl, fmt.Errorf("%s", errorRes.Text)
 		}
 		return tl, fmt.Errorf("timelines API: %s", err.Error())
 	}

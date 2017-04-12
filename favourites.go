@@ -20,12 +20,10 @@ func (g *Client) GetFavourites() ([]Status, error) {
 	println(r.Body)
 	err = json.Unmarshal([]byte(r.Body), &faves)
 	if err != nil {
-		var res struct {
-			Error string `json:"error"`
-		}
-		err2 := json.Unmarshal([]byte(r.Body), &res)
+		var errorRes Error
+		err2 := json.Unmarshal([]byte(r.Body), &errorRes)
 		if err2 == nil {
-			return faves, fmt.Errorf("%s", res.Error)
+			return faves, fmt.Errorf("%s", errorRes.Text)
 		}
 		return faves, fmt.Errorf("favourites API: %s", err.Error())
 	}
