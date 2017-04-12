@@ -11,6 +11,8 @@ type Client struct {
 	Secret      string
 	APIBase     string
 	InstanceURL string
+
+	userToken *UserToken
 }
 
 /*

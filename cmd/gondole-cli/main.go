@@ -1,17 +1,20 @@
 package main
 
 import (
-	"github.com/keltia/gondole"
-	"github.com/urfave/cli"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/urfave/cli"
+
+	"github.com/keltia/gondole"
 )
 
 var (
-	fVerbose  bool
-	fInstance string
-	fScopes   string
+	fVerbose             bool
+	fInstance            string
+	fUsername, fPassword string
+	fScopes              string
 
 	instance *gondole.Client
 	cnf      *Server
@@ -134,6 +137,16 @@ func main() {
 			Name:        "scopes,S",
 			Usage:       "use these scopes",
 			Destination: &fScopes,
+		},
+		cli.StringFlag{
+			Name:        "username,login",
+			Usage:       "user name",
+			Destination: &fUsername,
+		},
+		cli.StringFlag{
+			Name:        "password",
+			Usage:       "user password",
+			Destination: &fPassword,
 		},
 	}
 	app.Run(os.Args)
