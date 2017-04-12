@@ -17,7 +17,11 @@ func (g *Client) GetTimelines(timeline string) ([]Status, error) {
 	if timeline == "home" || timeline == "public" {
 		endPoint = "timelines/" + timeline
 	} else if strings.HasPrefix(timeline, ":") {
-		endPoint = "timelines/tag/" + timeline
+		hashtag := timeline[1:]
+		if hashtag == "" {
+			return tl, fmt.Errorf("timelines API: empty hashtag")
+		}
+		endPoint = "timelines/tag/" + hashtag
 	} else {
 		return tl, fmt.Errorf("GetTimelines: bad timelines argument")
 	}
