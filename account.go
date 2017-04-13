@@ -55,8 +55,8 @@ func (g *Client) getSingleAccount(target string, id int) (*Account, error) {
 		}
 	}
 
-	var account Account
 	// Not an error reply; let's unmarshal the data
+	var account Account
 	err = json.Unmarshal([]byte(r.Body), &account)
 	if err != nil {
 		return nil, fmt.Errorf("getAccount (%s) API: %s", target, err.Error())
@@ -88,12 +88,15 @@ func (g *Client) getMultipleAccounts(target string, opts *getAccountsOptions) ([
 	}
 
 	req := g.prepareRequest(endPoint)
+
+	// Handle target-specific query parameters
 	if target == "search" {
 		req.QueryParams["q"] = opts.Q
 		if opts.Limit > 0 {
 			req.QueryParams["limit"] = strconv.Itoa(opts.Limit)
 		}
 	}
+
 	r, err := rest.API(req)
 	if err != nil {
 		return nil, fmt.Errorf("getAccount (%s): %s", target, err.Error())
@@ -108,8 +111,8 @@ func (g *Client) getMultipleAccounts(target string, opts *getAccountsOptions) ([
 		}
 	}
 
-	var accounts []Account
 	// Not an error reply; let's unmarshal the data
+	var accounts []Account
 	err = json.Unmarshal([]byte(r.Body), &accounts)
 	if err != nil {
 		return nil, fmt.Errorf("getAccount (%s) API: %s", target, err.Error())
@@ -203,8 +206,8 @@ func (g *Client) FollowRemoteAccount(id string) (*Account, error) {
 		}
 	}
 
-	var account Account
 	// Not an error reply; let's unmarshal the data
+	var account Account
 	err = json.Unmarshal([]byte(r.Body), &account)
 	if err != nil {
 		return nil, fmt.Errorf("FollowRemoteAccount API: %s", err.Error())
@@ -288,16 +291,14 @@ func (g *Client) GetAccountFollowRequests() ([]Account, error) {
 // GetAccountRelationships returns a list of relationship entities for the given accounts
 // NOTE: Currently it doesn't seem to work with several items.
 func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, error) {
-	var rl []Relationship
-
 	if len(accountIDs) < 1 {
-		return rl, ErrInvalidID
+		return nil, ErrInvalidID
 	}
 
 	req := g.prepareRequest("accounts/relationships")
 
 	if len(accountIDs) > 1 { // XXX
-		return rl, fmt.Errorf("accounts/relationships currently does not work with more than 1 ID")
+		return nil, fmt.Errorf("accounts/relationships currently does not work with more than 1 ID")
 	}
 	req.QueryParams["id"] = strconv.Itoa(accountIDs[0])
 	/*
@@ -309,7 +310,7 @@ func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, erro
 
 	r, err := rest.API(req)
 	if err != nil {
-		return rl, fmt.Errorf("GetAccountRelationships: %s", err.Error())
+		return nil, fmt.Errorf("GetAccountRelationships: %s", err.Error())
 	}
 
 	// Check for error reply
@@ -322,9 +323,51 @@ func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, erro
 	}
 
 	// Not an error reply; let's unmarshal the data
+	var rl []Relationship
 	err = json.Unmarshal([]byte(r.Body), &rl)
 	if err != nil {
 		return nil, fmt.Errorf("accounts/relationships API: %s", err.Error())
 	}
 	return rl, nil
+}
+
+// GetAccountStatuses returns a list of status entities for the given account
+// If onlyMedia is true, returns only statuses that have media attachments.
+// If excludeReplies is true, skip statuses that reply to other statuses.
+func (g *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bool) ([]Status, error) {
+	if accountID < 1 {
+		return nil, ErrInvalidID
+	}
+
+	endPoint := "accounts/" + strconv.Itoa(accountID) + "/" + "statuses"
+	req := g.prepareRequest(endPoint)
+
+	if onlyMedia {
+		req.QueryParams["only_media"] = "true"
+	}
+	if excludeReplies {
+		req.QueryParams["exclude_replies"] = "true"
+	}
+
+	r, err := rest.API(req)
+	if err != nil {
+		return nil, fmt.Errorf("GetAccountStatuses: %s", err.Error())
+	}
+
+	// Check for error reply
+	var errorResult Error
+	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
+		// The empty object is not an error
+		if errorResult.Text != "" {
+			return nil, fmt.Errorf("%s", errorResult.Text)
+		}
+	}
+
+	// Not an error reply; let's unmarshal the data
+	var sl []Status
+	err = json.Unmarshal([]byte(r.Body), &sl)
+	if err != nil {
+		return nil, fmt.Errorf("accounts/statuses API: %s", err.Error())
+	}
+	return sl, nil
 }
