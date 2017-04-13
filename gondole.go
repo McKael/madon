@@ -19,8 +19,10 @@ const (
 	NoRedirect = "urn:ietf:wg:oauth:2.0:oob"
 )
 
+// Error codes
 var (
-	ErrAlreadyRegistered = errors.New("App already registered")
+	ErrAlreadyRegistered = errors.New("app already registered")
+	ErrEntityNotFound    = errors.New("entity not found")
 )
 
 // prepareRequest insert all pre-defined stuff

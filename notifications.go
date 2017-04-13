@@ -51,6 +51,10 @@ func (g *Client) GetNotification(id int) (*Notification, error) {
 		return &notification, fmt.Errorf("notification API: %s", err.Error())
 	}
 
+	if notification.ID == 0 {
+		return nil, ErrEntityNotFound
+	}
+
 	return &notification, nil
 }
 
