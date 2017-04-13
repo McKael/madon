@@ -54,15 +54,13 @@ type Attachment struct {
 	TextURL    string `json:"text_url"`
 }
 
-/*
 // Card represents a Mastodon card entity
 type Card struct {
-	URL         string       `json:"url"`
-	Title       string       `json:"title"`
-	Description string       `json:"description"`
-	Image       *interface{} `json:"image"`
+	URL         string `json:"url"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
 }
-*/
 
 // Context represents a Mastodon context entity
 type Context struct {
