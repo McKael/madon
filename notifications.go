@@ -32,6 +32,8 @@ func (g *Client) GetNotifications() ([]Notification, error) {
 }
 
 // GetNotification returns a notification
+// The returned notification can be nil if there is an error or if the
+// requested notification does not exist.
 func (g *Client) GetNotification(id int) (*Notification, error) {
 	var notification Notification
 
