@@ -20,7 +20,8 @@ type getAccountsOptions struct {
 
 // getSingleAccount returns an account entity
 // The target can be "account", "verify_credentials", "follow", "unfollow",
-// "block", "unblock", "mute" or "unmute".
+// "block", "unblock", "mute", "unmute", "follow_requests/authorize" or
+// "follow_requests/reject".
 // The id is optional and depends on the target.
 func (g *Client) getSingleAccount(target string, id int) (*Account, error) {
 	var endPoint string
@@ -35,12 +36,18 @@ func (g *Client) getSingleAccount(target string, id int) (*Account, error) {
 	case "follow", "unfollow", "block", "unblock", "mute", "unmute":
 		endPoint = "accounts/" + strID + "/" + target
 		method = rest.Post
+	case "follow_requests/authorize", "follow_requests/reject":
+		// The documentation is incorrect, the endpoint actually
+		// is "follow_requests/:id/{authorize|reject}"
+		endPoint = target[:16] + strID + "/" + target[16:]
+		method = rest.Post
 	default:
 		return nil, ErrInvalidParameter
 	}
 
 	req := g.prepareRequest(endPoint)
 	req.Method = method
+
 	r, err := rest.API(req)
 	if err != nil {
 		return nil, fmt.Errorf("getAccount (%s): %s", target, err.Error())
@@ -370,4 +377,14 @@ func (g *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies boo
 		return nil, fmt.Errorf("accounts/statuses API: %s", err.Error())
 	}
 	return sl, nil
+}
+
+// FollowRequestAuthorize authorizes or rejects an account follow-request
+func (g *Client) FollowRequestAuthorize(accountID int, authorize bool) error {
+	endPoint := "follow_requests/reject"
+	if authorize {
+		endPoint = "follow_requests/authorize"
+	}
+	_, err := g.getSingleAccount(endPoint, accountID)
+	return err
 }
