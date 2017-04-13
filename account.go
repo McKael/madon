@@ -179,6 +179,42 @@ func (g *Client) UnfollowAccount(id int) error {
 	return nil
 }
 
+// FollowRemoteAccount follows a remote account
+// The parameter 'id' is a URI (username@domain).
+func (g *Client) FollowRemoteAccount(id string) (*Account, error) {
+	if id == "" {
+		return nil, ErrInvalidID
+	}
+
+	req := g.prepareRequest("follows")
+	req.Method = rest.Post
+	req.QueryParams["uri"] = id
+	r, err := rest.API(req)
+	if err != nil {
+		return nil, fmt.Errorf("FollowRemoteAccount: %s", err.Error())
+	}
+
+	// Check for error reply
+	var errorResult Error
+	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
+		// The empty object is not an error
+		if errorResult.Text != "" {
+			return nil, fmt.Errorf("%s", errorResult.Text)
+		}
+	}
+
+	var account Account
+	// Not an error reply; let's unmarshal the data
+	err = json.Unmarshal([]byte(r.Body), &account)
+	if err != nil {
+		return nil, fmt.Errorf("FollowRemoteAccount API: %s", err.Error())
+	}
+	if account.ID == 0 {
+		return nil, ErrEntityNotFound
+	}
+	return &account, nil
+}
+
 // BlockAccount blocks an account
 func (g *Client) BlockAccount(id int) error {
 	account, err := g.getSingleAccount("block", id)
@@ -247,4 +283,48 @@ func (g *Client) GetMutedAccounts() ([]Account, error) {
 // GetAccountFollowRequests returns the list of follow requests accounts
 func (g *Client) GetAccountFollowRequests() ([]Account, error) {
 	return g.getMultipleAccounts("follow_requests", nil)
+}
+
+// GetAccountRelationships returns a list of relationship entities for the given accounts
+// NOTE: Currently it doesn't seem to work with several items.
+func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, error) {
+	var rl []Relationship
+
+	if len(accountIDs) < 1 {
+		return rl, ErrInvalidID
+	}
+
+	req := g.prepareRequest("accounts/relationships")
+
+	if len(accountIDs) > 1 { // XXX
+		return rl, fmt.Errorf("accounts/relationships currently does not work with more than 1 ID")
+	}
+	req.QueryParams["id"] = strconv.Itoa(accountIDs[0])
+	/*
+		for i, id := range accountIDList {
+			qID := fmt.Sprintf("id[%d]", i+1)
+			req.QueryParams[qID] = strconv.Itoa(id)
+		}
+	*/
+
+	r, err := rest.API(req)
+	if err != nil {
+		return rl, fmt.Errorf("GetAccountRelationships: %s", err.Error())
+	}
+
+	// Check for error reply
+	var errorResult Error
+	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
+		// The empty object is not an error
+		if errorResult.Text != "" {
+			return nil, fmt.Errorf("%s", errorResult.Text)
+		}
+	}
+
+	// Not an error reply; let's unmarshal the data
+	err = json.Unmarshal([]byte(r.Body), &rl)
+	if err != nil {
+		return nil, fmt.Errorf("accounts/relationships API: %s", err.Error())
+	}
+	return rl, nil
 }
