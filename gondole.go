@@ -23,6 +23,7 @@ const (
 var (
 	ErrAlreadyRegistered = errors.New("app already registered")
 	ErrEntityNotFound    = errors.New("entity not found")
+	ErrInvalidParameter  = errors.New("incorrect parameter")
 	ErrInvalidID         = errors.New("incorrect entity ID")
 )
 
