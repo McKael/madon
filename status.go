@@ -158,33 +158,27 @@ func (g *Client) GetStatus(id int) (*Status, error) {
 	if err := g.queryStatusData(id, "status", &status); err != nil {
 		return nil, err
 	}
-
 	if status.ID == 0 {
 		return nil, ErrEntityNotFound
 	}
-
 	return &status, nil
 }
 
 // GetStatusContext returns a status context
 func (g *Client) GetStatusContext(id int) (*Context, error) {
 	var context Context
-
 	if err := g.queryStatusData(id, "context", &context); err != nil {
 		return nil, err
 	}
-
 	return &context, nil
 }
 
 // GetStatusCard returns a status card
 func (g *Client) GetStatusCard(id int) (*Card, error) {
 	var card Card
-
 	if err := g.queryStatusData(id, "card", &card); err != nil {
 		return nil, err
 	}
-
 	return &card, nil
 }
 

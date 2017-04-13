@@ -125,11 +125,9 @@ func (g *Client) GetAccount(id int) (*Account, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	if account != nil && account.ID == 0 {
 		return nil, ErrEntityNotFound
 	}
-
 	return account, nil
 }
 
@@ -139,11 +137,9 @@ func (g *Client) GetCurrentAccount() (*Account, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	if account != nil && account.ID == 0 {
 		return nil, ErrEntityNotFound
 	}
-
 	return account, nil
 }
 
@@ -165,11 +161,9 @@ func (g *Client) FollowAccount(id int) error {
 	if err != nil {
 		return err
 	}
-
 	if account != nil && account.ID != id {
 		return ErrEntityNotFound
 	}
-
 	return nil
 }
 
@@ -179,11 +173,9 @@ func (g *Client) UnfollowAccount(id int) error {
 	if err != nil {
 		return err
 	}
-
 	if account != nil && account.ID != id {
 		return ErrEntityNotFound
 	}
-
 	return nil
 }
 
@@ -193,11 +185,9 @@ func (g *Client) BlockAccount(id int) error {
 	if err != nil {
 		return err
 	}
-
 	if account != nil && account.ID != id {
 		return ErrEntityNotFound
 	}
-
 	return nil
 }
 
@@ -207,11 +197,9 @@ func (g *Client) UnblockAccount(id int) error {
 	if err != nil {
 		return err
 	}
-
 	if account != nil && account.ID != id {
 		return ErrEntityNotFound
 	}
-
 	return nil
 }
 
@@ -221,11 +209,9 @@ func (g *Client) MuteAccount(id int) error {
 	if err != nil {
 		return err
 	}
-
 	if account != nil && account.ID != id {
 		return ErrEntityNotFound
 	}
-
 	return nil
 }
 
@@ -235,11 +221,9 @@ func (g *Client) UnmuteAccount(id int) error {
 	if err != nil {
 		return err
 	}
-
 	if account != nil && account.ID != id {
 		return ErrEntityNotFound
 	}
-
 	return nil
 }
 
