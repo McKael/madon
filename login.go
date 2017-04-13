@@ -3,18 +3,21 @@ package gondole
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/sendgrid/rest"
 )
 
+// UserToken represents a user token as returned by the Mastodon API
 type UserToken struct {
-	Access_token string `json:"access_token"`
-	CreatedAt    int    `json:"created_at"`
-	Scope        string `json:"scope"`
-	TokenType    string `json:"token_type"`
+	AccessToken string `json:"access_token"`
+	CreatedAt   int    `json:"created_at"`
+	Scope       string `json:"scope"`
+	TokenType   string `json:"token_type"`
 }
 
-func (g *Client) LoginBasic(username, password string) error {
+// LoginBasic does basic user authentication
+func (g *Client) LoginBasic(username, password string, scopes []string) error {
 	if username == "" {
 		return fmt.Errorf("missing username")
 	}
@@ -26,13 +29,16 @@ func (g *Client) LoginBasic(username, password string) error {
 	opts := make(map[string]string)
 
 	hdrs["User-Agent"] = "Gondole/" + GondoleVersion
-	hdrs["Authorization"] = "Bearer %s" + g.Secret
+	hdrs["Authorization"] = "Bearer " + g.Secret
 
 	opts["grant_type"] = "password"
 	opts["client_id"] = g.ID
 	opts["client_secret"] = g.Secret
 	opts["username"] = username
 	opts["password"] = password
+	if len(scopes) > 0 {
+		opts["scope"] = strings.Join(scopes, " ")
+	}
 
 	req := rest.Request{
 		BaseURL:     g.InstanceURL + "/oauth/token",
@@ -48,7 +54,6 @@ func (g *Client) LoginBasic(username, password string) error {
 
 	var resp UserToken
 
-	println(r.Body)
 	err = json.Unmarshal([]byte(r.Body), &resp)
 	if err != nil {
 		return err

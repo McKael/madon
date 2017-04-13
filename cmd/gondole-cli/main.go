@@ -41,7 +41,7 @@ type Server struct {
 	Name        string `json:"name"`
 	BearerToken string `json:"bearer_token"`
 	APIBase     string `json:"base_url"`
-	InstanceURL string `json:"base_url"`
+	InstanceURL string `json:"instance_url"`
 }
 
 type Config struct {
@@ -74,6 +74,13 @@ func setupEnvironment(c *cli.Context) (err error) {
 
 	}
 
+	// Set scopes
+	if fScopes != "" {
+		scopes = strings.Split(fScopes, " ")
+	} else {
+		scopes = ourScopes
+	}
+
 	// Load configuration, will register if none is found
 	cnf, err = LoadConfig(instanceName)
 	if err == nil && cnf != nil {
@@ -100,13 +107,6 @@ func setupEnvironment(c *cli.Context) (err error) {
 			log.Fatalf("error: can not write config for %s", instanceName)
 		}
 
-		// Now register this through OAuth
-		if fScopes != "" {
-			scopes = strings.Split(fScopes, " ")
-		} else {
-			scopes = ourScopes
-		}
-
 		instance, err = gondole.NewApp("gondole-cli", scopes, gondole.NoRedirect, instanceURL)
 
 		server := &Server{
@@ -129,12 +129,11 @@ func setupEnvironment(c *cli.Context) (err error) {
 		if err != nil {
 			log.Fatalf("error: can not write config for %s", instance.Name)
 		}
-
 	}
 
 	// Log in to the instance
 	if fAuthMethod != "oauth2" {
-		err = instance.LoginBasic(fUsername, fPassword)
+		err = instance.LoginBasic(fUsername, fPassword, scopes)
 	}
 
 	return err

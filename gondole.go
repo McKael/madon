@@ -39,7 +39,7 @@ func (g *Client) prepareRequest(what string) (req rest.Request) {
 	// Insert our sig
 	hdrs["User-Agent"] = fmt.Sprintf("Gondole/%s", GondoleVersion)
 	if g.userToken != nil {
-		hdrs["Authorization"] = fmt.Sprintf("Bearer %s", g.userToken.Access_token)
+		hdrs["Authorization"] = fmt.Sprintf("Bearer %s", g.userToken.AccessToken)
 	}
 
 	req = rest.Request{
