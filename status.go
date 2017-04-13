@@ -8,7 +8,7 @@ import (
 	"github.com/sendgrid/rest"
 )
 
-// updateStatusOptions contains option field for POST and DELETE API calls
+// updateStatusOptions contains option fields for POST and DELETE API calls
 type updateStatusOptions struct {
 	// The ID is used for most commands
 	ID int
