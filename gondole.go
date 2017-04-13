@@ -23,6 +23,7 @@ const (
 var (
 	ErrAlreadyRegistered = errors.New("app already registered")
 	ErrEntityNotFound    = errors.New("entity not found")
+	ErrInvalidID         = errors.New("incorrect entity ID")
 )
 
 // prepareRequest insert all pre-defined stuff
