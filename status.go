@@ -48,16 +48,20 @@ func (g *Client) queryStatusData(statusID int, subquery string, data interface{}
 		return fmt.Errorf("status/%s API query: %s", subquery, err.Error())
 	}
 
-	err = json.Unmarshal([]byte(r.Body), &data)
-	if err != nil {
-		var errorRes Error
-		err2 := json.Unmarshal([]byte(r.Body), &errorRes)
-		if err2 == nil {
-			return fmt.Errorf("%s", errorRes.Text)
+	// Check for error reply
+	var errorResult Error
+	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
+		// The empty object is not an error
+		if errorResult.Text != "" {
+			return fmt.Errorf("%s", errorResult.Text)
 		}
-		return fmt.Errorf("status/%s API: %s", subquery, err.Error())
 	}
 
+	// Not an error reply; let's unmarshal the data
+	err = json.Unmarshal([]byte(r.Body), &data)
+	if err != nil {
+		return fmt.Errorf("status/%s API: %s", subquery, err.Error())
+	}
 	return nil
 }
 
@@ -131,10 +135,13 @@ func (g *Client) updateStatusData(subquery string, opts updateStatusOptions, dat
 	// Check for error reply
 	var errorResult Error
 	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
-		return fmt.Errorf("%s", errorResult.Text)
+		// The empty object is not an error
+		if errorResult.Text != "" {
+			return fmt.Errorf("%s", errorResult.Text)
+		}
 	}
 
-	// Not an error reply; let's unmarshall the data
+	// Not an error reply; let's unmarshal the data
 	err = json.Unmarshal([]byte(r.Body), &data)
 	if err != nil {
 		return fmt.Errorf("status/%s API: %s", subquery, err.Error())
