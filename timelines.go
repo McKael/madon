@@ -9,24 +9,32 @@ import (
 )
 
 // GetTimelines returns a timeline (a list of statuses
-// timeline can be "home", "public", or a hashtag (":hashtag")
-func (g *Client) GetTimelines(timeline string) ([]Status, error) {
+// timeline can be "home", "public", or a hashtag (use ":hashtag")
+// For the public timelines, you can set 'local' to true to get only the
+// local instance.
+func (g *Client) GetTimelines(timeline string, local bool) ([]Status, error) {
 	var endPoint string
 	var tl []Status
 
-	if timeline == "home" || timeline == "public" {
+	switch {
+	case timeline == "home", timeline == "public":
 		endPoint = "timelines/" + timeline
-	} else if strings.HasPrefix(timeline, ":") {
+	case strings.HasPrefix(timeline, ":"):
 		hashtag := timeline[1:]
 		if hashtag == "" {
 			return tl, fmt.Errorf("timelines API: empty hashtag")
 		}
 		endPoint = "timelines/tag/" + hashtag
-	} else {
+	default:
 		return tl, fmt.Errorf("GetTimelines: bad timelines argument")
 	}
 
 	req := g.prepareRequest(endPoint)
+
+	if timeline == "public" && local {
+		req.QueryParams["local"] = "true"
+	}
+
 	r, err := rest.API(req)
 	if err != nil {
 		return tl, fmt.Errorf("timelines API query: %s", err.Error())
