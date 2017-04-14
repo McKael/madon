@@ -29,7 +29,6 @@ func (g *Client) LoginBasic(username, password string, scopes []string) error {
 	opts := make(map[string]string)
 
 	hdrs["User-Agent"] = "Gondole/" + GondoleVersion
-	hdrs["Authorization"] = "Bearer " + g.Secret
 
 	opts["grant_type"] = "password"
 	opts["client_id"] = g.ID
