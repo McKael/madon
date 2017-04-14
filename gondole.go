@@ -1,11 +1,15 @@
 package gondole
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
 	"github.com/sendgrid/rest"
 )
+
+// apiCallParams is a map with the parameters for an API call
+type apiCallParams map[string]string
 
 const (
 	// GondoleVersion contains the version of the Gondole implementation
@@ -27,16 +31,12 @@ var (
 	ErrInvalidID         = errors.New("incorrect entity ID")
 )
 
-// prepareRequest insert all pre-defined stuff
-func (g *Client) prepareRequest(what string) (req rest.Request) {
-	var endPoint string
+// prepareRequest inserts all pre-defined stuff
+func (g *Client) prepareRequest(target string, method rest.Method, params apiCallParams) (req rest.Request) {
+	endPoint := g.APIBase + "/" + target
 
-	endPoint = g.APIBase + "/" + what
-	// Add at least one option, the APIkey if present
+	// Request headers
 	hdrs := make(map[string]string)
-	opts := make(map[string]string)
-
-	// Insert our sig
 	hdrs["User-Agent"] = fmt.Sprintf("Gondole/%s", GondoleVersion)
 	if g.userToken != nil {
 		hdrs["Authorization"] = fmt.Sprintf("Bearer %s", g.userToken.AccessToken)
@@ -45,7 +45,36 @@ func (g *Client) prepareRequest(what string) (req rest.Request) {
 	req = rest.Request{
 		BaseURL:     endPoint,
 		Headers:     hdrs,
-		QueryParams: opts,
+		Method:      method,
+		QueryParams: params,
 	}
 	return
+}
+
+// apiCall makes a call to the Mastodon API server
+func (g *Client) apiCall(endPoint string, method rest.Method, params apiCallParams, data interface{}) error {
+	// Prepare query
+	req := g.prepareRequest(endPoint, method, params)
+
+	// Make API call
+	r, err := rest.API(req)
+	if err != nil {
+		return fmt.Errorf("API query (%s) failed: %s", endPoint, err.Error())
+	}
+
+	// Check for error reply
+	var errorResult Error
+	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
+		// The empty object is not an error
+		if errorResult.Text != "" {
+			return fmt.Errorf("%s", errorResult.Text)
+		}
+	}
+
+	// Not an error reply; let's unmarshal the data
+	err = json.Unmarshal([]byte(r.Body), &data)
+	if err != nil {
+		return fmt.Errorf("cannot decode API response (%s): %s", method, err.Error())
+	}
+	return nil
 }

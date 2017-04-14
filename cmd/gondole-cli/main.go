@@ -108,6 +108,9 @@ func setupEnvironment(c *cli.Context) (err error) {
 		}
 
 		instance, err = gondole.NewApp("gondole-cli", scopes, gondole.NoRedirect, instanceURL)
+		if err != nil {
+			log.Fatalf("error: can not register application:", err.Error())
+		}
 
 		server := &Server{
 			ID:          instance.ID,

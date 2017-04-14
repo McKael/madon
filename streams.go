@@ -28,7 +28,7 @@ type StreamEvent struct {
 // The stream name can be "user", "public" or "hashtag".
 // For "hashtag", the hashTag argument cannot be empty.
 func (g *Client) openStream(streamName, hashTag string) (*http.Response, error) {
-	req := g.prepareRequest("streaming/" + streamName)
+	params := make(apiCallParams)
 
 	switch streamName {
 	case "user", "public":
@@ -36,15 +36,17 @@ func (g *Client) openStream(streamName, hashTag string) (*http.Response, error) 
 		if hashTag == "" {
 			return nil, ErrInvalidParameter
 		}
-		req.QueryParams["tag"] = hashTag
+		params["tag"] = hashTag
 	default:
 		return nil, ErrInvalidParameter
 	}
 
+	req := g.prepareRequest("streaming/"+streamName, rest.Get, params)
 	reqObj, err := rest.BuildRequestObject(req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build stream request: %s", err.Error())
 	}
+
 	resp, err := rest.MakeRequest(reqObj)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open stream: %s", err.Error())

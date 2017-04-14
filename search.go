@@ -1,9 +1,6 @@
 package gondole
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/sendgrid/rest"
 )
 
@@ -12,30 +9,16 @@ func (g *Client) Search(query string, resolve bool) (*Results, error) {
 	if query == "" {
 		return nil, ErrInvalidParameter
 	}
-	req := g.prepareRequest("search")
-	req.QueryParams["q"] = query
+
+	params := make(apiCallParams)
+	params["q"] = query
 	if resolve {
-		req.QueryParams["resolve"] = "true"
-	}
-	r, err := rest.API(req)
-	if err != nil {
-		return nil, fmt.Errorf("search: %s", err.Error())
+		params["resolve"] = "true"
 	}
 
-	// Check for error reply
-	var errorResult Error
-	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
-		// The empty object is not an error
-		if errorResult.Text != "" {
-			return nil, fmt.Errorf("%s", errorResult.Text)
-		}
-	}
-
-	// Not an error reply; let's unmarshal the data
 	var results Results
-	err = json.Unmarshal([]byte(r.Body), &results)
-	if err != nil {
-		return nil, fmt.Errorf("search API: %s", err.Error())
+	if err := g.apiCall("search", rest.Get, params, &results); err != nil {
+		return nil, err
 	}
 	return &results, nil
 }

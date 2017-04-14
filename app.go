@@ -1,8 +1,6 @@
 package gondole
 
 import (
-	"encoding/json"
-	"log"
 	"net/url"
 	"strings"
 
@@ -37,30 +35,22 @@ func NewApp(name string, scopes []string, redirectURI, instanceURL string) (g *C
 		InstanceURL: instanceURL,
 	}
 
-	req := g.prepareRequest("apps")
+	params := make(apiCallParams)
+	params["client_name"] = name
+	params["scopes"] = strings.Join(scopes, " ")
 	if redirectURI != "" {
-		req.QueryParams["redirect_uris"] = redirectURI
+		params["redirect_uris"] = redirectURI
 	} else {
-		req.QueryParams["redirect_uris"] = NoRedirect
-	}
-	req.QueryParams["client_name"] = name
-	req.QueryParams["scopes"] = strings.Join(scopes, " ")
-	req.Method = rest.Post
-
-	r, err := rest.API(req)
-	if err != nil {
-		log.Fatalf("error can not register app: %v", err)
+		params["redirect_uris"] = NoRedirect
 	}
 
-	var resp registerApp
-
-	err = json.Unmarshal([]byte(r.Body), &resp)
-	if err != nil {
-		log.Fatalf("error can not register app: %v", err)
+	var app registerApp
+	if err := g.apiCall("apps", rest.Post, params, &app); err != nil {
+		return nil, err
 	}
 
-	g.ID = resp.ClientID
-	g.Secret = resp.ClientSecret
+	g.ID = app.ClientID
+	g.Secret = app.ClientSecret
 
 	return
 }

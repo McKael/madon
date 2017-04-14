@@ -1,7 +1,6 @@
 package gondole
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -23,59 +22,41 @@ type updateStatusOptions struct {
 }
 
 // queryStatusData queries the statuses API
-// The subquery can be empty or "status" (the status itself), "context",
+// The operation 'op' can be empty or "status" (the status itself), "context",
 // "card", "reblogged_by", "favourited_by".
 // The data argument will receive the object(s) returned by the API server.
-func (g *Client) queryStatusData(statusID int, subquery string, data interface{}) error {
-	endPoint := "statuses/" + strconv.Itoa(statusID)
-
+func (g *Client) queryStatusData(statusID int, op string, data interface{}) error {
 	if statusID < 1 {
 		return ErrInvalidID
 	}
 
-	if subquery != "" && subquery != "status" {
-		switch subquery {
+	endPoint := "statuses/" + strconv.Itoa(statusID)
+
+	if op != "" && op != "status" {
+		switch op {
 		case "context", "card", "reblogged_by", "favourited_by":
 		default:
 			return ErrInvalidParameter
 		}
 
-		endPoint += "/" + subquery
-	}
-	req := g.prepareRequest(endPoint)
-	r, err := rest.API(req)
-	if err != nil {
-		return fmt.Errorf("status/%s API query: %s", subquery, err.Error())
+		endPoint += "/" + op
 	}
 
-	// Check for error reply
-	var errorResult Error
-	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
-		// The empty object is not an error
-		if errorResult.Text != "" {
-			return fmt.Errorf("%s", errorResult.Text)
-		}
-	}
-
-	// Not an error reply; let's unmarshal the data
-	err = json.Unmarshal([]byte(r.Body), &data)
-	if err != nil {
-		return fmt.Errorf("status/%s API: %s", subquery, err.Error())
-	}
-	return nil
+	return g.apiCall(endPoint, rest.Get, nil, data)
 }
 
 // updateStatusData updates the statuses
-// The subquery can be empty or "status" (to post a status), "delete" (for
-// deleting a status), "reblog", "unreblog", "favourite", "unfavourite".
+// The operation 'op' can be empty or "status" (to post a status), "delete"
+// (for deleting a status), "reblog", "unreblog", "favourite", "unfavourite".
 // The data argument will receive the object(s) returned by the API server.
-func (g *Client) updateStatusData(subquery string, opts updateStatusOptions, data interface{}) error {
+func (g *Client) updateStatusData(op string, opts updateStatusOptions, data interface{}) error {
 	method := rest.Post
 	endPoint := "statuses"
+	params := make(apiCallParams)
 
-	switch subquery {
+	switch op {
 	case "", "status":
-		subquery = "status"
+		op = "status"
 		if opts.Status == "" {
 			return ErrInvalidParameter
 		}
@@ -98,55 +79,33 @@ func (g *Client) updateStatusData(subquery string, opts updateStatusOptions, dat
 		if opts.ID < 1 {
 			return ErrInvalidID
 		}
-		endPoint += "/" + strconv.Itoa(opts.ID) + "/" + subquery
+		endPoint += "/" + strconv.Itoa(opts.ID) + "/" + op
 	default:
 		return ErrInvalidParameter
 	}
 
-	req := g.prepareRequest(endPoint)
-	req.Method = method
-
 	// Form items for a new toot
-	if subquery == "status" {
-		req.QueryParams["status"] = opts.Status
+	if op == "status" {
+		params["status"] = opts.Status
 		if opts.InReplyToID > 0 {
-			req.QueryParams["in_reply_to_id"] = strconv.Itoa(opts.InReplyToID)
+			params["in_reply_to_id"] = strconv.Itoa(opts.InReplyToID)
 		}
 		for i, id := range opts.MediaIDs {
 			qID := fmt.Sprintf("media_ids[%d]", i+1)
-			req.QueryParams[qID] = strconv.Itoa(id)
+			params[qID] = strconv.Itoa(id)
 		}
 		if opts.Sensitive {
-			req.QueryParams["sensitive"] = "true"
+			params["sensitive"] = "true"
 		}
 		if opts.SpoilerText != "" {
-			req.QueryParams["spoiler_text"] = opts.SpoilerText
+			params["spoiler_text"] = opts.SpoilerText
 		}
 		if opts.Visibility != "" {
-			req.QueryParams["visibility"] = opts.Visibility
+			params["visibility"] = opts.Visibility
 		}
 	}
 
-	r, err := rest.API(req)
-	if err != nil {
-		return fmt.Errorf("status/%s API query: %s", subquery, err.Error())
-	}
-
-	// Check for error reply
-	var errorResult Error
-	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
-		// The empty object is not an error
-		if errorResult.Text != "" {
-			return fmt.Errorf("%s", errorResult.Text)
-		}
-	}
-
-	// Not an error reply; let's unmarshal the data
-	err = json.Unmarshal([]byte(r.Body), &data)
-	if err != nil {
-		return fmt.Errorf("status/%s API: %s", subquery, err.Error())
-	}
-	return nil
+	return g.apiCall(endPoint, method, params, data)
 }
 
 // GetStatus returns a status

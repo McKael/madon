@@ -1,7 +1,6 @@
 package gondole
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -19,110 +18,75 @@ type getAccountsOptions struct {
 }
 
 // getSingleAccount returns an account entity
-// The target can be "account", "verify_credentials", "follow", "unfollow",
-// "block", "unblock", "mute", "unmute", "follow_requests/authorize" or
-// "follow_requests/reject".
-// The id is optional and depends on the target.
-func (g *Client) getSingleAccount(target string, id int) (*Account, error) {
+// The operation 'op' can be "account", "verify_credentials", "follow",
+// "unfollow", "block", "unblock", "mute", "unmute",
+// "follow_requests/authorize" or // "follow_requests/reject".
+// The id is optional and depends on the operation.
+func (g *Client) getSingleAccount(op string, id int) (*Account, error) {
 	var endPoint string
 	method := rest.Get
 	strID := strconv.Itoa(id)
 
-	switch target {
+	switch op {
 	case "account":
 		endPoint = "accounts/" + strID
 	case "verify_credentials":
 		endPoint = "accounts/verify_credentials"
 	case "follow", "unfollow", "block", "unblock", "mute", "unmute":
-		endPoint = "accounts/" + strID + "/" + target
+		endPoint = "accounts/" + strID + "/" + op
 		method = rest.Post
 	case "follow_requests/authorize", "follow_requests/reject":
 		// The documentation is incorrect, the endpoint actually
 		// is "follow_requests/:id/{authorize|reject}"
-		endPoint = target[:16] + strID + "/" + target[16:]
+		endPoint = op[:16] + strID + "/" + op[16:]
 		method = rest.Post
 	default:
 		return nil, ErrInvalidParameter
 	}
 
-	req := g.prepareRequest(endPoint)
-	req.Method = method
-
-	r, err := rest.API(req)
-	if err != nil {
-		return nil, fmt.Errorf("getAccount (%s): %s", target, err.Error())
-	}
-
-	// Check for error reply
-	var errorResult Error
-	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
-		// The empty object is not an error
-		if errorResult.Text != "" {
-			return nil, fmt.Errorf("%s", errorResult.Text)
-		}
-	}
-
-	// Not an error reply; let's unmarshal the data
 	var account Account
-	err = json.Unmarshal([]byte(r.Body), &account)
-	if err != nil {
-		return nil, fmt.Errorf("getAccount (%s) API: %s", target, err.Error())
+	if err := g.apiCall(endPoint, method, nil, &account); err != nil {
+		return nil, err
 	}
 	return &account, nil
 }
 
 // getMultipleAccounts returns a list of account entities
-// The target can be "followers", "following", "search", "blocks", "mutes",
-// "follow_requests".
-// The id is optional and depends on the target.
-func (g *Client) getMultipleAccounts(target string, opts *getAccountsOptions) ([]Account, error) {
+// The operation 'op' can be "followers", "following", "search", "blocks",
+// "mutes", "follow_requests".
+// The id is optional and depends on the operation.
+func (g *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Account, error) {
 	var endPoint string
-	switch target {
+
+	switch op {
 	case "followers", "following":
 		if opts == nil || opts.ID < 1 {
 			return []Account{}, ErrInvalidID
 		}
-		endPoint = "accounts/" + strconv.Itoa(opts.ID) + "/" + target
+		endPoint = "accounts/" + strconv.Itoa(opts.ID) + "/" + op
 	case "follow_requests", "blocks", "mutes":
-		endPoint = target
+		endPoint = op
 	case "search":
 		if opts == nil || opts.Q == "" {
 			return []Account{}, ErrInvalidParameter
 		}
-		endPoint = "accounts/" + target
+		endPoint = "accounts/" + op
 	default:
 		return nil, ErrInvalidParameter
 	}
 
-	req := g.prepareRequest(endPoint)
-
 	// Handle target-specific query parameters
-	if target == "search" {
-		req.QueryParams["q"] = opts.Q
+	params := make(apiCallParams)
+	if op == "search" {
+		params["q"] = opts.Q
 		if opts.Limit > 0 {
-			req.QueryParams["limit"] = strconv.Itoa(opts.Limit)
+			params["limit"] = strconv.Itoa(opts.Limit)
 		}
 	}
 
-	r, err := rest.API(req)
-	if err != nil {
-		return nil, fmt.Errorf("getAccount (%s): %s", target, err.Error())
-	}
-
-	// Check for error reply
-	var errorResult Error
-	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
-		// The empty object is not an error
-		if errorResult.Text != "" {
-			return nil, fmt.Errorf("%s", errorResult.Text)
-		}
-	}
-
-	// Not an error reply; let's unmarshal the data
 	var accounts []Account
-	err = json.Unmarshal([]byte(r.Body), &accounts)
-	if err != nil {
-		return nil, fmt.Errorf("getAccount (%s) API: %s", target, err.Error())
+	if err := g.apiCall(endPoint, rest.Get, params, &accounts); err != nil {
+		return nil, err
 	}
 	return accounts, nil
 }
@@ -190,34 +154,18 @@ func (g *Client) UnfollowAccount(id int) error {
 }
 
 // FollowRemoteAccount follows a remote account
-// The parameter 'id' is a URI (username@domain).
-func (g *Client) FollowRemoteAccount(id string) (*Account, error) {
-	if id == "" {
+// The parameter 'uri' is a URI (e.g. "username@domain").
+func (g *Client) FollowRemoteAccount(uri string) (*Account, error) {
+	if uri == "" {
 		return nil, ErrInvalidID
 	}
 
-	req := g.prepareRequest("follows")
-	req.Method = rest.Post
-	req.QueryParams["uri"] = id
-	r, err := rest.API(req)
-	if err != nil {
-		return nil, fmt.Errorf("FollowRemoteAccount: %s", err.Error())
-	}
+	params := make(apiCallParams)
+	params["uri"] = uri
 
-	// Check for error reply
-	var errorResult Error
-	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
-		// The empty object is not an error
-		if errorResult.Text != "" {
-			return nil, fmt.Errorf("%s", errorResult.Text)
-		}
-	}
-
-	// Not an error reply; let's unmarshal the data
 	var account Account
-	err = json.Unmarshal([]byte(r.Body), &account)
-	if err != nil {
-		return nil, fmt.Errorf("FollowRemoteAccount API: %s", err.Error())
+	if err := g.apiCall("follows", rest.Post, params, &account); err != nil {
+		return nil, err
 	}
 	if account.ID == 0 {
 		return nil, ErrEntityNotFound
@@ -302,38 +250,22 @@ func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, erro
 		return nil, ErrInvalidID
 	}
 
-	req := g.prepareRequest("accounts/relationships")
-
 	if len(accountIDs) > 1 { // XXX
 		return nil, fmt.Errorf("accounts/relationships currently does not work with more than 1 ID")
 	}
-	req.QueryParams["id"] = strconv.Itoa(accountIDs[0])
+
+	params := make(apiCallParams)
+	params["id"] = strconv.Itoa(accountIDs[0])
 	/*
 		for i, id := range accountIDList {
 			qID := fmt.Sprintf("id[%d]", i+1)
-			req.QueryParams[qID] = strconv.Itoa(id)
+			params[qID] = strconv.Itoa(id)
 		}
 	*/
 
-	r, err := rest.API(req)
-	if err != nil {
-		return nil, fmt.Errorf("GetAccountRelationships: %s", err.Error())
-	}
-
-	// Check for error reply
-	var errorResult Error
-	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
-		// The empty object is not an error
-		if errorResult.Text != "" {
-			return nil, fmt.Errorf("%s", errorResult.Text)
-		}
-	}
-
-	// Not an error reply; let's unmarshal the data
 	var rl []Relationship
-	err = json.Unmarshal([]byte(r.Body), &rl)
-	if err != nil {
-		return nil, fmt.Errorf("accounts/relationships API: %s", err.Error())
+	if err := g.apiCall("accounts/relationships", rest.Get, params, &rl); err != nil {
+		return nil, err
 	}
 	return rl, nil
 }
@@ -347,34 +279,17 @@ func (g *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies boo
 	}
 
 	endPoint := "accounts/" + strconv.Itoa(accountID) + "/" + "statuses"
-	req := g.prepareRequest(endPoint)
-
+	params := make(apiCallParams)
 	if onlyMedia {
-		req.QueryParams["only_media"] = "true"
+		params["only_media"] = "true"
 	}
 	if excludeReplies {
-		req.QueryParams["exclude_replies"] = "true"
+		params["exclude_replies"] = "true"
 	}
 
-	r, err := rest.API(req)
-	if err != nil {
-		return nil, fmt.Errorf("GetAccountStatuses: %s", err.Error())
-	}
-
-	// Check for error reply
-	var errorResult Error
-	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
-		// The empty object is not an error
-		if errorResult.Text != "" {
-			return nil, fmt.Errorf("%s", errorResult.Text)
-		}
-	}
-
-	// Not an error reply; let's unmarshal the data
 	var sl []Status
-	err = json.Unmarshal([]byte(r.Body), &sl)
-	if err != nil {
-		return nil, fmt.Errorf("accounts/statuses API: %s", err.Error())
+	if err := g.apiCall(endPoint, rest.Get, params, &sl); err != nil {
+		return nil, err
 	}
 	return sl, nil
 }
