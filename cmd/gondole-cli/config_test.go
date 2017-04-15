@@ -52,10 +52,11 @@ func TestLoadInstance(t *testing.T) {
 	assert.NoError(t, err, "should be fine")
 
 	real := &Server{
-		ID:          "666",
+		ID:          "666abcdef666",
 		Name:        "foo",
 		BearerToken: "d3b07384d113edec49eaa6238ad5ff00",
-		BaseURL:     "https://mastodon.social",
+		APIBase:     "https://mastodon.social/api/v1",
+		InstanceURL: "https://mastodon.social",
 	}
 	file = filepath.Join("test", "foo")
 	s, err := loadInstance(file)
