@@ -244,24 +244,16 @@ func (g *Client) GetAccountFollowRequests() ([]Account, error) {
 }
 
 // GetAccountRelationships returns a list of relationship entities for the given accounts
-// NOTE: Currently it doesn't seem to work with several items.
 func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, error) {
 	if len(accountIDs) < 1 {
 		return nil, ErrInvalidID
 	}
 
-	if len(accountIDs) > 1 { // XXX
-		return nil, fmt.Errorf("accounts/relationships currently does not work with more than 1 ID")
-	}
-
 	params := make(apiCallParams)
-	params["id"] = strconv.Itoa(accountIDs[0])
-	/*
-		for i, id := range accountIDList {
-			qID := fmt.Sprintf("id[%d]", i+1)
-			params[qID] = strconv.Itoa(id)
-		}
-	*/
+	for i, id := range accountIDs {
+		qID := fmt.Sprintf("id[%d]", i+1)
+		params[qID] = strconv.Itoa(id)
+	}
 
 	var rl []Relationship
 	if err := g.apiCall("accounts/relationships", rest.Get, params, &rl); err != nil {

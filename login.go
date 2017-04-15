@@ -46,7 +46,7 @@ func (g *Client) LoginBasic(username, password string, scopes []string) error {
 		Method:      rest.Post,
 	}
 
-	r, err := rest.API(req)
+	r, err := restAPI(req)
 	if err != nil {
 		return err
 	}
