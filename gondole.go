@@ -38,8 +38,8 @@ func (g *Client) prepareRequest(target string, method rest.Method, params apiCal
 	// Request headers
 	hdrs := make(map[string]string)
 	hdrs["User-Agent"] = fmt.Sprintf("Gondole/%s", GondoleVersion)
-	if g.userToken != nil {
-		hdrs["Authorization"] = fmt.Sprintf("Bearer %s", g.userToken.AccessToken)
+	if g.UserToken != nil {
+		hdrs["Authorization"] = fmt.Sprintf("Bearer %s", g.UserToken.AccessToken)
 	}
 
 	req = rest.Request{

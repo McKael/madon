@@ -12,7 +12,7 @@ type Client struct {
 	APIBase     string
 	InstanceURL string
 
-	userToken *UserToken
+	UserToken *UserToken
 }
 
 /*

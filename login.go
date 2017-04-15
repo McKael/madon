@@ -58,6 +58,6 @@ func (g *Client) LoginBasic(username, password string, scopes []string) error {
 		return err
 	}
 
-	g.userToken = &resp
+	g.UserToken = &resp
 	return nil
 }
