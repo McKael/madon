@@ -37,26 +37,12 @@ func (g *Client) UploadMedia(filePath string) (*Attachment, error) {
 
 	w.Close()
 
-	req := g.prepareRequest("media", rest.Post, nil)
+	req, err := g.prepareRequest("media", rest.Post, nil)
+	if err != nil {
+		return nil, fmt.Errorf("media prepareRequest failed: %s", err.Error())
+	}
 	req.Headers["Content-Type"] = w.FormDataContentType()
 	req.Body = b.Bytes()
-
-	/*
-		reqObj, err := rest.BuildRequestObject(req)
-		if err != nil {
-			return nil, fmt.Errorf("cannot build stream request: %s", err.Error())
-		}
-
-		resp, err := rest.MakeRequest(reqObj)
-		if err != nil {
-			return nil, fmt.Errorf("cannot open stream: %s", err.Error())
-		}
-		if resp.StatusCode != 200 {
-			resp.Body.Close()
-			return nil, errors.New(resp.Status)
-		}
-		return resp, nil
-	*/
 
 	// Make API call
 	r, err := restAPI(req)

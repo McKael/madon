@@ -18,6 +18,10 @@ type UserToken struct {
 
 // LoginBasic does basic user authentication
 func (g *Client) LoginBasic(username, password string, scopes []string) error {
+	if g == nil {
+		return fmt.Errorf("use of uninitialized gondole client")
+	}
+
 	if username == "" {
 		return fmt.Errorf("missing username")
 	}

@@ -69,7 +69,13 @@ func restAPI(request rest.Request) (*rest.Response, error) {
 }
 
 // prepareRequest inserts all pre-defined stuff
-func (g *Client) prepareRequest(target string, method rest.Method, params apiCallParams) (req rest.Request) {
+func (g *Client) prepareRequest(target string, method rest.Method, params apiCallParams) (rest.Request, error) {
+	var req rest.Request
+
+	if g == nil {
+		return req, fmt.Errorf("use of uninitialized gondole client")
+	}
+
 	endPoint := g.APIBase + "/" + target
 
 	// Request headers
@@ -85,13 +91,20 @@ func (g *Client) prepareRequest(target string, method rest.Method, params apiCal
 		Method:      method,
 		QueryParams: params,
 	}
-	return
+	return req, nil
 }
 
 // apiCall makes a call to the Mastodon API server
 func (g *Client) apiCall(endPoint string, method rest.Method, params apiCallParams, data interface{}) error {
+	if g == nil {
+		return fmt.Errorf("use of uninitialized gondole client")
+	}
+
 	// Prepare query
-	req := g.prepareRequest(endPoint, method, params)
+	req, err := g.prepareRequest(endPoint, method, params)
+	if err != nil {
+		return err
+	}
 
 	// Make API call
 	r, err := restAPI(req)

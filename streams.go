@@ -41,7 +41,11 @@ func (g *Client) openStream(streamName, hashTag string) (*http.Response, error) 
 		return nil, ErrInvalidParameter
 	}
 
-	req := g.prepareRequest("streaming/"+streamName, rest.Get, params)
+	req, err := g.prepareRequest("streaming/"+streamName, rest.Get, params)
+	if err != nil {
+		return nil, fmt.Errorf("cannot build stream request: %s", err.Error())
+	}
+
 	reqObj, err := rest.BuildRequestObject(req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build stream request: %s", err.Error())
@@ -175,6 +179,10 @@ func (g *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, doneC
 // The 'doneCh' channel is closed if the connection is closed by the server.
 // Please note that this method launches a goroutine to listen to the events.
 func (g *Client) StreamListener(name, hashTag string, events chan<- StreamEvent, stopCh <-chan bool, doneCh chan<- bool) error {
+	if g == nil {
+		return fmt.Errorf("use of uninitialized gondole client")
+	}
+
 	resp, err := g.openStream(name, hashTag)
 	if err != nil {
 		return err

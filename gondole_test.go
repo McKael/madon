@@ -15,6 +15,7 @@ func TestPrepareRequest(t *testing.T) {
 		APIBase: "http://example.com",
 	}
 
-	req := g.prepareRequest("bar", rest.Get, nil)
+	req, err := g.prepareRequest("bar", rest.Get, nil)
+	assert.NoError(t, err, "no error")
 	assert.NotNil(t, req.Headers, "not nil")
 }
