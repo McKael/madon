@@ -8,7 +8,7 @@ import (
 )
 
 // GetTimelines returns a timeline (a list of statuses
-// timeline can be "home", "public", or a hashtag (use ":hashtag")
+// timeline can be "home", "public", or a hashtag (use ":hashtag" or "#hashtag")
 // For the public timelines, you can set 'local' to true to get only the
 // local instance.
 func (g *Client) GetTimelines(timeline string, local bool) ([]Status, error) {
@@ -17,7 +17,7 @@ func (g *Client) GetTimelines(timeline string, local bool) ([]Status, error) {
 	switch {
 	case timeline == "home", timeline == "public":
 		endPoint = "timelines/" + timeline
-	case strings.HasPrefix(timeline, ":"):
+	case strings.HasPrefix(timeline, ":"), strings.HasPrefix(timeline, "#"):
 		hashtag := timeline[1:]
 		if hashtag == "" {
 			return nil, fmt.Errorf("timelines API: empty hashtag")
