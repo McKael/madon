@@ -59,7 +59,7 @@ func (g *Client) LoginBasic(username, password string, scopes []string) error {
 
 	err = json.Unmarshal([]byte(r.Body), &resp)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot unmarshal server response: %s", err.Error())
 	}
 
 	g.UserToken = &resp
