@@ -13,13 +13,13 @@ import (
 
 // Client contains data for a gondole client application
 type Client struct {
-	Name        string
-	ID          string
-	Secret      string
-	APIBase     string
-	InstanceURL string
+	Name        string // Name of the client
+	ID          string // Application ID
+	Secret      string // Application secret
+	APIBase     string // API prefix URL
+	InstanceURL string // Instance base URL
 
-	UserToken *UserToken
+	UserToken *UserToken // User token
 }
 
 /*

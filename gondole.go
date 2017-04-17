@@ -16,11 +16,11 @@ type apiCallParams map[string]string
 
 const (
 	// GondoleVersion contains the version of the Gondole implementation
-	GondoleVersion = "0.0"
+	GondoleVersion = "0.1"
 
-	defaultInstanceURL = "https://mastodon.social"
-	apiVersion         = "v1" // That is not overridable
-	defaultAPIPath     = "/api/" + apiVersion
+	// API version implemented in this library
+	apiVersion     = "v1"
+	currentAPIPath = "/api/" + apiVersion
 
 	// NoRedirect is the URI for no redirection in the App registration
 	NoRedirect = "urn:ietf:wg:oauth:2.0:oob"

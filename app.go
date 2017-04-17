@@ -8,6 +8,7 @@ Licensed under the MIT license.  Please see the LICENSE file is this directory.
 package gondole
 
 import (
+	"errors"
 	"net/url"
 	"strings"
 
@@ -20,26 +21,41 @@ type registerApp struct {
 	ClientSecret string `json:"client_secret"`
 }
 
-// NewApp registers a new instance
-func NewApp(name string, scopes []string, redirectURI, instanceURL string) (g *Client, err error) {
-	if instanceURL == "" {
-		instanceURL = defaultInstanceURL
+// buildInstanceURL creates the URL from the instance name or cleans up the
+// provided URL
+func buildInstanceURL(instanceName string) (string, error) {
+	if instanceName == "" {
+		return "", errors.New("no instance provided")
 	}
 
-	if !strings.Contains(instanceURL, "://") {
-		instanceURL = "https://" + instanceURL
+	instanceURL := instanceName
+	if !strings.Contains(instanceURL, "/") {
+		instanceURL = "https://" + instanceName
 	}
 
-	apiPath := instanceURL + defaultAPIPath
+	u, err := url.ParseRequestURI(instanceURL)
+	if err != nil {
+		return "", err
+	}
 
-	if _, err := url.ParseRequestURI(apiPath); err != nil {
+	u.Path = ""
+	u.RawPath = ""
+	u.RawQuery = ""
+	u.Fragment = ""
+	return u.String(), nil
+}
+
+// NewApp registers a new application with a given instance
+func NewApp(name string, scopes []string, redirectURI, instanceName string) (g *Client, err error) {
+	instanceURL, err := buildInstanceURL(instanceName)
+	if err != nil {
 		return nil, err
 	}
 
 	g = &Client{
 		Name:        name,
-		APIBase:     apiPath,
 		InstanceURL: instanceURL,
+		APIBase:     instanceURL + currentAPIPath,
 	}
 
 	params := make(apiCallParams)
@@ -60,4 +76,21 @@ func NewApp(name string, scopes []string, redirectURI, instanceURL string) (g *C
 	g.Secret = app.ClientSecret
 
 	return
+}
+
+// RestoreApp recreates an application client with existing secrets
+func RestoreApp(name, instanceName, appID, appSecret string, userToken *UserToken) (g *Client, err error) {
+	instanceURL, err := buildInstanceURL(instanceName)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{
+		Name:        name,
+		InstanceURL: instanceURL,
+		APIBase:     instanceURL + currentAPIPath,
+		ID:          appID,
+		Secret:      appSecret,
+		UserToken:   userToken,
+	}, nil
 }
