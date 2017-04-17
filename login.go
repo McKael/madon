@@ -71,3 +71,18 @@ func (g *Client) LoginBasic(username, password string, scopes []string) error {
 	g.UserToken = &resp
 	return nil
 }
+
+// SetUserToken sets an existing user credentials
+// No verification of the arguments is made.
+func (g *Client) SetUserToken(token, username, password string, scopes []string) error {
+	if g == nil {
+		return fmt.Errorf("use of uninitialized gondole client")
+	}
+
+	g.UserToken = &UserToken{
+		AccessToken: token,
+		Scope:       strings.Join(scopes, " "),
+		TokenType:   "bearer",
+	}
+	return nil
+}
