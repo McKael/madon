@@ -257,6 +257,9 @@ func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, erro
 
 	params := make(apiCallParams)
 	for i, id := range accountIDs {
+		if id < 1 {
+			return nil, ErrInvalidID
+		}
 		qID := fmt.Sprintf("id[%d]", i+1)
 		params[qID] = strconv.Itoa(id)
 	}

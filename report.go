@@ -32,6 +32,9 @@ func (g *Client) ReportUser(accountID int, statusIDs []int, comment string) (*Re
 	params["account_id"] = strconv.Itoa(accountID)
 	params["comment"] = comment
 	for i, id := range statusIDs {
+		if id < 1 {
+			return nil, ErrInvalidID
+		}
 		qID := fmt.Sprintf("status_ids[%d]", i+1)
 		params[qID] = strconv.Itoa(id)
 	}

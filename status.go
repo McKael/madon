@@ -97,6 +97,9 @@ func (g *Client) updateStatusData(op string, opts updateStatusOptions, data inte
 			params["in_reply_to_id"] = strconv.Itoa(opts.InReplyToID)
 		}
 		for i, id := range opts.MediaIDs {
+			if id < 1 {
+				return ErrInvalidID
+			}
 			qID := fmt.Sprintf("media_ids[%d]", i+1)
 			params[qID] = strconv.Itoa(id)
 		}
