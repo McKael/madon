@@ -107,6 +107,7 @@ type Notification struct {
 
 // Relationship represents a Mastodon relationship entity
 type Relationship struct {
+	ID         int  `json:"id"`
 	Following  bool `json:"following"`
 	FollowedBy bool `json:"followed_by"`
 	Blocking   bool `json:"blocking"`
