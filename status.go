@@ -117,10 +117,10 @@ func (g *Client) updateStatusData(op string, opts updateStatusOptions, data inte
 // GetStatus returns a status
 // The returned status can be nil if there is an error or if the
 // requested ID does not exist.
-func (g *Client) GetStatus(id int) (*Status, error) {
+func (g *Client) GetStatus(statusID int) (*Status, error) {
 	var status Status
 
-	if err := g.queryStatusData(id, "status", &status); err != nil {
+	if err := g.queryStatusData(statusID, "status", &status); err != nil {
 		return nil, err
 	}
 	if status.ID == 0 {
@@ -130,34 +130,34 @@ func (g *Client) GetStatus(id int) (*Status, error) {
 }
 
 // GetStatusContext returns a status context
-func (g *Client) GetStatusContext(id int) (*Context, error) {
+func (g *Client) GetStatusContext(statusID int) (*Context, error) {
 	var context Context
-	if err := g.queryStatusData(id, "context", &context); err != nil {
+	if err := g.queryStatusData(statusID, "context", &context); err != nil {
 		return nil, err
 	}
 	return &context, nil
 }
 
 // GetStatusCard returns a status card
-func (g *Client) GetStatusCard(id int) (*Card, error) {
+func (g *Client) GetStatusCard(statusID int) (*Card, error) {
 	var card Card
-	if err := g.queryStatusData(id, "card", &card); err != nil {
+	if err := g.queryStatusData(statusID, "card", &card); err != nil {
 		return nil, err
 	}
 	return &card, nil
 }
 
 // GetStatusRebloggedBy returns a list of the accounts who reblogged a status
-func (g *Client) GetStatusRebloggedBy(id int) ([]Account, error) {
+func (g *Client) GetStatusRebloggedBy(statusID int) ([]Account, error) {
 	var accounts []Account
-	err := g.queryStatusData(id, "reblogged_by", &accounts)
+	err := g.queryStatusData(statusID, "reblogged_by", &accounts)
 	return accounts, err
 }
 
 // GetStatusFavouritedBy returns a list of the accounts who favourited a status
-func (g *Client) GetStatusFavouritedBy(id int) ([]Account, error) {
+func (g *Client) GetStatusFavouritedBy(statusID int) ([]Account, error) {
 	var accounts []Account
-	err := g.queryStatusData(id, "favourited_by", &accounts)
+	err := g.queryStatusData(statusID, "favourited_by", &accounts)
 	return accounts, err
 }
 
@@ -186,41 +186,41 @@ func (g *Client) PostStatus(text string, inReplyTo int, mediaIDs []int, sensitiv
 }
 
 // DeleteStatus deletes a status
-func (g *Client) DeleteStatus(id int) error {
+func (g *Client) DeleteStatus(statusID int) error {
 	var status Status
-	o := updateStatusOptions{ID: id}
+	o := updateStatusOptions{ID: statusID}
 	err := g.updateStatusData("delete", o, &status)
 	return err
 }
 
 // ReblogStatus reblogs a status
-func (g *Client) ReblogStatus(id int) error {
+func (g *Client) ReblogStatus(statusID int) error {
 	var status Status
-	o := updateStatusOptions{ID: id}
+	o := updateStatusOptions{ID: statusID}
 	err := g.updateStatusData("reblog", o, &status)
 	return err
 }
 
 // UnreblogStatus unreblogs a status
-func (g *Client) UnreblogStatus(id int) error {
+func (g *Client) UnreblogStatus(statusID int) error {
 	var status Status
-	o := updateStatusOptions{ID: id}
+	o := updateStatusOptions{ID: statusID}
 	err := g.updateStatusData("unreblog", o, &status)
 	return err
 }
 
 // FavouriteStatus favourites a status
-func (g *Client) FavouriteStatus(id int) error {
+func (g *Client) FavouriteStatus(statusID int) error {
 	var status Status
-	o := updateStatusOptions{ID: id}
+	o := updateStatusOptions{ID: statusID}
 	err := g.updateStatusData("favourite", o, &status)
 	return err
 }
 
 // UnfavouriteStatus unfavourites a status
-func (g *Client) UnfavouriteStatus(id int) error {
+func (g *Client) UnfavouriteStatus(statusID int) error {
 	var status Status
-	o := updateStatusOptions{ID: id}
+	o := updateStatusOptions{ID: statusID}
 	err := g.updateStatusData("unfavourite", o, &status)
 	return err
 }

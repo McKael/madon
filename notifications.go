@@ -24,12 +24,12 @@ func (g *Client) GetNotifications() ([]Notification, error) {
 // GetNotification returns a notification
 // The returned notification can be nil if there is an error or if the
 // requested notification does not exist.
-func (g *Client) GetNotification(id int) (*Notification, error) {
-	if id < 1 {
+func (g *Client) GetNotification(notificationID int) (*Notification, error) {
+	if notificationID < 1 {
 		return nil, ErrInvalidID
 	}
 
-	var endPoint = "notifications/" + strconv.Itoa(id)
+	var endPoint = "notifications/" + strconv.Itoa(notificationID)
 	var notification Notification
 	if err := g.apiCall(endPoint, rest.Get, nil, &notification); err != nil {
 		return nil, err

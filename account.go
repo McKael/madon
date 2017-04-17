@@ -100,8 +100,8 @@ func (g *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Acc
 // GetAccount returns an account entity
 // The returned value can be nil if there is an error or if the
 // requested ID does not exist.
-func (g *Client) GetAccount(id int) (*Account, error) {
-	account, err := g.getSingleAccount("account", id)
+func (g *Client) GetAccount(accountID int) (*Account, error) {
+	account, err := g.getSingleAccount("account", accountID)
 	if err != nil {
 		return nil, err
 	}
@@ -136,24 +136,24 @@ func (g *Client) GetAccountFollowing(accountID int) ([]Account, error) {
 }
 
 // FollowAccount follows an account
-func (g *Client) FollowAccount(id int) error {
-	account, err := g.getSingleAccount("follow", id)
+func (g *Client) FollowAccount(accountID int) error {
+	account, err := g.getSingleAccount("follow", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != id {
+	if account != nil && account.ID != accountID {
 		return ErrEntityNotFound
 	}
 	return nil
 }
 
 // UnfollowAccount unfollows an account
-func (g *Client) UnfollowAccount(id int) error {
-	account, err := g.getSingleAccount("unfollow", id)
+func (g *Client) UnfollowAccount(accountID int) error {
+	account, err := g.getSingleAccount("unfollow", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != id {
+	if account != nil && account.ID != accountID {
 		return ErrEntityNotFound
 	}
 	return nil
@@ -180,48 +180,48 @@ func (g *Client) FollowRemoteAccount(uri string) (*Account, error) {
 }
 
 // BlockAccount blocks an account
-func (g *Client) BlockAccount(id int) error {
-	account, err := g.getSingleAccount("block", id)
+func (g *Client) BlockAccount(accountID int) error {
+	account, err := g.getSingleAccount("block", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != id {
+	if account != nil && account.ID != accountID {
 		return ErrEntityNotFound
 	}
 	return nil
 }
 
 // UnblockAccount unblocks an account
-func (g *Client) UnblockAccount(id int) error {
-	account, err := g.getSingleAccount("unblock", id)
+func (g *Client) UnblockAccount(accountID int) error {
+	account, err := g.getSingleAccount("unblock", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != id {
+	if account != nil && account.ID != accountID {
 		return ErrEntityNotFound
 	}
 	return nil
 }
 
 // MuteAccount mutes an account
-func (g *Client) MuteAccount(id int) error {
-	account, err := g.getSingleAccount("mute", id)
+func (g *Client) MuteAccount(accountID int) error {
+	account, err := g.getSingleAccount("mute", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != id {
+	if account != nil && account.ID != accountID {
 		return ErrEntityNotFound
 	}
 	return nil
 }
 
 // UnmuteAccount unmutes an account
-func (g *Client) UnmuteAccount(id int) error {
-	account, err := g.getSingleAccount("unmute", id)
+func (g *Client) UnmuteAccount(accountID int) error {
+	account, err := g.getSingleAccount("unmute", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != id {
+	if account != nil && account.ID != accountID {
 		return ErrEntityNotFound
 	}
 	return nil
