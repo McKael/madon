@@ -1,3 +1,9 @@
+/*
+Copyright 2017 Mikael Berthe
+
+Licensed under the MIT license.  Please see the LICENSE file is this directory.
+*/
+
 package gondole
 
 import (
