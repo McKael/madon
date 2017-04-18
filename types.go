@@ -30,19 +30,19 @@ Everything manipulated/returned by the API
 
 // Account represents a Mastodon account entity
 type Account struct {
-	ID             int    `json:"id"`
-	Username       string `json:"username"`
-	Acct           string `json:"acct"`
-	DisplayName    string `json:"display_name"`
-	Note           string `json:"note"`
-	URL            string `json:"url"`
-	Avatar         string `json:"avatar"`
-	Header         string `json:"header"`
-	Locked         bool   `json:"locked"`
-	CreatedAt      string `json:"created_at"`
-	FollowersCount int    `json:"followers_count"`
-	FollowingCount int    `json:"following_count"`
-	StatusesCount  int    `json:"statuses_count"`
+	ID             int       `json:"id"`
+	Username       string    `json:"username"`
+	Acct           string    `json:"acct"`
+	DisplayName    string    `json:"display_name"`
+	Note           string    `json:"note"`
+	URL            string    `json:"url"`
+	Avatar         string    `json:"avatar"`
+	Header         string    `json:"header"`
+	Locked         bool      `json:"locked"`
+	CreatedAt      time.Time `json:"created_at"`
+	FollowersCount int       `json:"followers_count"`
+	FollowingCount int       `json:"following_count"`
+	StatusesCount  int       `json:"statuses_count"`
 }
 
 // Application represents a Mastodon application entity
@@ -98,11 +98,11 @@ type Mention struct {
 
 // Notification represents a Mastodon notification entity
 type Notification struct {
-	ID        int      `json:"id"`
-	Type      string   `json:"type"`
-	CreatedAt string   `json:"created_at"`
-	Account   *Account `json:"account"`
-	Status    *Status  `json:"status"`
+	ID        int       `json:"id"`
+	Type      string    `json:"type"`
+	CreatedAt time.Time `json:"created_at"`
+	Account   *Account  `json:"account"`
+	Status    *Status   `json:"status"`
 }
 
 // Relationship represents a Mastodon relationship entity
