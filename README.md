@@ -29,10 +29,10 @@ implementation.
 
 ## History
 
-The library was initially submitted as a PR for gondole.
+This API implementation was initially submitted as a PR for gondole.
 
-The repository is actually a fork of my gondole branch in order to preserve
-history and credits.
+The repository is actually a fork of my gondole branch so that
+history and credits are preserved.
 
 ## References
 
