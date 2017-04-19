@@ -9,10 +9,8 @@ matrix:
   fast_finish: true
 branches:
   only:
-  - develop
   - master
 install:
 - go get github.com/urfave/cli
 - go get github.com/stretchr/testify/assert
-- go get github.com/naoina/toml
 - go get github.com/sendgrid/rest

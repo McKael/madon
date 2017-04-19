@@ -1,39 +1,41 @@
-# gondole
+# madon
 
-Go version of the Mastodon API
+Golang library for the Mastodon API
 
-[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/keltia/gondole) [![license](https://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/keltia/gondole/master/LICENSE) [![build](https://img.shields.io/travis/keltia/gondole.svg?style=flat)](https://travis-ci.org/keltia/gondole) [![Go Report Card](https://goreportcard.com/badge/github.com/keltia/gondole)](https://goreportcard.com/report/github.com/keltia/gondole)
+[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/McKael/madon)
+[![license](https://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/McKael/madon/master/LICENSE)
+[![build](https://img.shields.io/travis/McKael/madon.svg?style=flat)](https://travis-ci.org/McKael/madon)
+[![Go Report Card](https://goreportcard.com/badge/github.com/McKael/madon)](https://goreportcard.com/report/github.com/McKael/madon)
 
-`gondole` is a [Go](https://golang.org/) library to access the Mastondon [REST API](http://www.rubydoc.info/gems/mastodon-api/Mastodon/REST/API).
-
-**Work in progress, still incomplete**
+`madon` is a [Go](https://golang.org/) library to access the Mastondon REST API.
 
 ## Installation
 
-Like many Go-based tools, installation is very easy
-  
-    go get github.com/keltia/gondole/cmd/...
+To install the library:
 
-  or
-  
-    git clone https://github.com/keltia/gondole
-    go install ./cmd/...
+    go get github.com/McKael/madon
 
-The library is fetched, compiled and installed in whichever directory is specified by `$GOPATH`.  The `gondole-cli` binary will also be installed. 
+You can test it with my CLI tool:
 
-## Configuration
+    go get github.com/McKael/madonctl
 
-The configuration is stored in the standard place: `$HOME/.config/gondole`.  You can find a global configuration file named `config.toml`and a file for each instance you have connected with, named `<instance>.toml`.
+## Usage
 
-When you connect `gondole` to a given instance you have never connected before, it will register the application, get the token and save it.
+This section has not been written yet (PR welcome).
 
-## Name
+For now please check [godoc](https://godoc.org/github.com/McKael/madon) and
+check the [madonctl](https://godoc.org/github.com/McKael/madonctl) project
+implementation.
 
-Trying to define a name close to *Mastodon*, one could come up with *godon* and in French, *gondole* (the small boats in Venice) is easy to take.
+## History
+
+The library was initially submitted as a PR for gondole.
+
+The repository is actually a fork of my gondole branch in order to preserve
+history and credits.
 
 ## References
 
-- [Mastodon API doc](https://github.com/tootsuite/mastodon/blob/master/docs/Using-the-API/API.md)
-- [Mastodon Ruby API](http://www.rubydoc.info/gems/mastodon-api/Mastodon/REST/API)
-- [Mastodon Python](https://mastodonpy.readthedocs.io/en/latest/)
-- [Mastodon repo](https://github.com/tootsuite/mastodon)
+- [Mastodon API documentation](https://github.com/tootsuite/documentation/blob/master/Using-the-API/API.md)
+- [Mastodon Streaming API documentation](https://github.com/tootsuite/documentation/blob/master/Using-the-API/Streaming-API.md)
+- [Mastodon repository](https://github.com/tootsuite/mastodon)
