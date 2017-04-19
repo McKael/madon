@@ -24,7 +24,7 @@ You can test it with my CLI tool:
 This section has not been written yet (PR welcome).
 
 For now please check [godoc](https://godoc.org/github.com/McKael/madon) and
-check the [madonctl](https://godoc.org/github.com/McKael/madonctl) project
+check the [madonctl](https://github.com/McKael/madonctl) project
 implementation.
 
 ## History
