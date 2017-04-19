@@ -4,7 +4,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"strconv"
@@ -13,9 +13,9 @@ import (
 )
 
 // GetNotifications returns the list of the user's notifications
-func (g *Client) GetNotifications() ([]Notification, error) {
+func (mc *Client) GetNotifications() ([]Notification, error) {
 	var notifications []Notification
-	if err := g.apiCall("notifications", rest.Get, nil, &notifications); err != nil {
+	if err := mc.apiCall("notifications", rest.Get, nil, &notifications); err != nil {
 		return nil, err
 	}
 	return notifications, nil
@@ -24,14 +24,14 @@ func (g *Client) GetNotifications() ([]Notification, error) {
 // GetNotification returns a notification
 // The returned notification can be nil if there is an error or if the
 // requested notification does not exist.
-func (g *Client) GetNotification(notificationID int) (*Notification, error) {
+func (mc *Client) GetNotification(notificationID int) (*Notification, error) {
 	if notificationID < 1 {
 		return nil, ErrInvalidID
 	}
 
 	var endPoint = "notifications/" + strconv.Itoa(notificationID)
 	var notification Notification
-	if err := g.apiCall(endPoint, rest.Get, nil, &notification); err != nil {
+	if err := mc.apiCall(endPoint, rest.Get, nil, &notification); err != nil {
 		return nil, err
 	}
 	if notification.ID == 0 {
@@ -42,6 +42,6 @@ func (g *Client) GetNotification(notificationID int) (*Notification, error) {
 
 // ClearNotifications deletes all notifications from the Mastodon server for
 // the authenticated user
-func (g *Client) ClearNotifications() error {
-	return g.apiCall("notifications/clear", rest.Post, nil, &Notification{})
+func (mc *Client) ClearNotifications() error {
+	return mc.apiCall("notifications/clear", rest.Post, nil, &Notification{})
 }

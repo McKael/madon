@@ -4,7 +4,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"encoding/json"
@@ -23,9 +23,9 @@ type UserToken struct {
 }
 
 // LoginBasic does basic user authentication
-func (g *Client) LoginBasic(username, password string, scopes []string) error {
-	if g == nil {
-		return fmt.Errorf("use of uninitialized gondole client")
+func (mc *Client) LoginBasic(username, password string, scopes []string) error {
+	if mc == nil {
+		return ErrUninitializedClient
 	}
 
 	if username == "" {
@@ -38,11 +38,11 @@ func (g *Client) LoginBasic(username, password string, scopes []string) error {
 	hdrs := make(map[string]string)
 	opts := make(map[string]string)
 
-	hdrs["User-Agent"] = "Gondole/" + GondoleVersion
+	hdrs["User-Agent"] = "madon/" + MadonVersion
 
 	opts["grant_type"] = "password"
-	opts["client_id"] = g.ID
-	opts["client_secret"] = g.Secret
+	opts["client_id"] = mc.ID
+	opts["client_secret"] = mc.Secret
 	opts["username"] = username
 	opts["password"] = password
 	if len(scopes) > 0 {
@@ -50,7 +50,7 @@ func (g *Client) LoginBasic(username, password string, scopes []string) error {
 	}
 
 	req := rest.Request{
-		BaseURL:     g.InstanceURL + "/oauth/token",
+		BaseURL:     mc.InstanceURL + "/oauth/token",
 		Headers:     hdrs,
 		QueryParams: opts,
 		Method:      rest.Post,
@@ -68,18 +68,18 @@ func (g *Client) LoginBasic(username, password string, scopes []string) error {
 		return fmt.Errorf("cannot unmarshal server response: %s", err.Error())
 	}
 
-	g.UserToken = &resp
+	mc.UserToken = &resp
 	return nil
 }
 
 // SetUserToken sets an existing user credentials
 // No verification of the arguments is made.
-func (g *Client) SetUserToken(token, username, password string, scopes []string) error {
-	if g == nil {
-		return fmt.Errorf("use of uninitialized gondole client")
+func (mc *Client) SetUserToken(token, username, password string, scopes []string) error {
+	if mc == nil {
+		return ErrUninitializedClient
 	}
 
-	g.UserToken = &UserToken{
+	mc.UserToken = &UserToken{
 		AccessToken: token,
 		Scope:       strings.Join(scopes, " "),
 		TokenType:   "bearer",

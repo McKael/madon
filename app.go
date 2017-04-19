@@ -5,7 +5,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"errors"
@@ -46,13 +46,13 @@ func buildInstanceURL(instanceName string) (string, error) {
 }
 
 // NewApp registers a new application with a given instance
-func NewApp(name string, scopes []string, redirectURI, instanceName string) (g *Client, err error) {
+func NewApp(name string, scopes []string, redirectURI, instanceName string) (mc *Client, err error) {
 	instanceURL, err := buildInstanceURL(instanceName)
 	if err != nil {
 		return nil, err
 	}
 
-	g = &Client{
+	mc = &Client{
 		Name:        name,
 		InstanceURL: instanceURL,
 		APIBase:     instanceURL + currentAPIPath,
@@ -68,18 +68,18 @@ func NewApp(name string, scopes []string, redirectURI, instanceName string) (g *
 	}
 
 	var app registerApp
-	if err := g.apiCall("apps", rest.Post, params, &app); err != nil {
+	if err := mc.apiCall("apps", rest.Post, params, &app); err != nil {
 		return nil, err
 	}
 
-	g.ID = app.ClientID
-	g.Secret = app.ClientSecret
+	mc.ID = app.ClientID
+	mc.Secret = app.ClientSecret
 
 	return
 }
 
 // RestoreApp recreates an application client with existing secrets
-func RestoreApp(name, instanceName, appID, appSecret string, userToken *UserToken) (g *Client, err error) {
+func RestoreApp(name, instanceName, appID, appSecret string, userToken *UserToken) (mc *Client, err error) {
 	instanceURL, err := buildInstanceURL(instanceName)
 	if err != nil {
 		return nil, err

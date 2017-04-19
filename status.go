@@ -4,7 +4,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ type updateStatusOptions struct {
 // The operation 'op' can be empty or "status" (the status itself), "context",
 // "card", "reblogged_by", "favourited_by".
 // The data argument will receive the object(s) returned by the API server.
-func (g *Client) queryStatusData(statusID int, op string, data interface{}) error {
+func (mc *Client) queryStatusData(statusID int, op string, data interface{}) error {
 	if statusID < 1 {
 		return ErrInvalidID
 	}
@@ -48,14 +48,14 @@ func (g *Client) queryStatusData(statusID int, op string, data interface{}) erro
 		endPoint += "/" + op
 	}
 
-	return g.apiCall(endPoint, rest.Get, nil, data)
+	return mc.apiCall(endPoint, rest.Get, nil, data)
 }
 
 // updateStatusData updates the statuses
 // The operation 'op' can be empty or "status" (to post a status), "delete"
 // (for deleting a status), "reblog", "unreblog", "favourite", "unfavourite".
 // The data argument will receive the object(s) returned by the API server.
-func (g *Client) updateStatusData(op string, opts updateStatusOptions, data interface{}) error {
+func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data interface{}) error {
 	method := rest.Post
 	endPoint := "statuses"
 	params := make(apiCallParams)
@@ -114,16 +114,16 @@ func (g *Client) updateStatusData(op string, opts updateStatusOptions, data inte
 		}
 	}
 
-	return g.apiCall(endPoint, method, params, data)
+	return mc.apiCall(endPoint, method, params, data)
 }
 
 // GetStatus returns a status
 // The returned status can be nil if there is an error or if the
 // requested ID does not exist.
-func (g *Client) GetStatus(statusID int) (*Status, error) {
+func (mc *Client) GetStatus(statusID int) (*Status, error) {
 	var status Status
 
-	if err := g.queryStatusData(statusID, "status", &status); err != nil {
+	if err := mc.queryStatusData(statusID, "status", &status); err != nil {
 		return nil, err
 	}
 	if status.ID == 0 {
@@ -133,41 +133,41 @@ func (g *Client) GetStatus(statusID int) (*Status, error) {
 }
 
 // GetStatusContext returns a status context
-func (g *Client) GetStatusContext(statusID int) (*Context, error) {
+func (mc *Client) GetStatusContext(statusID int) (*Context, error) {
 	var context Context
-	if err := g.queryStatusData(statusID, "context", &context); err != nil {
+	if err := mc.queryStatusData(statusID, "context", &context); err != nil {
 		return nil, err
 	}
 	return &context, nil
 }
 
 // GetStatusCard returns a status card
-func (g *Client) GetStatusCard(statusID int) (*Card, error) {
+func (mc *Client) GetStatusCard(statusID int) (*Card, error) {
 	var card Card
-	if err := g.queryStatusData(statusID, "card", &card); err != nil {
+	if err := mc.queryStatusData(statusID, "card", &card); err != nil {
 		return nil, err
 	}
 	return &card, nil
 }
 
 // GetStatusRebloggedBy returns a list of the accounts who reblogged a status
-func (g *Client) GetStatusRebloggedBy(statusID int) ([]Account, error) {
+func (mc *Client) GetStatusRebloggedBy(statusID int) ([]Account, error) {
 	var accounts []Account
-	err := g.queryStatusData(statusID, "reblogged_by", &accounts)
+	err := mc.queryStatusData(statusID, "reblogged_by", &accounts)
 	return accounts, err
 }
 
 // GetStatusFavouritedBy returns a list of the accounts who favourited a status
-func (g *Client) GetStatusFavouritedBy(statusID int) ([]Account, error) {
+func (mc *Client) GetStatusFavouritedBy(statusID int) ([]Account, error) {
 	var accounts []Account
-	err := g.queryStatusData(statusID, "favourited_by", &accounts)
+	err := mc.queryStatusData(statusID, "favourited_by", &accounts)
 	return accounts, err
 }
 
 // PostStatus posts a new "toot"
 // All parameters but "text" can be empty.
 // Visibility must be empty, or one of "direct", "private", "unlisted" and "public".
-func (g *Client) PostStatus(text string, inReplyTo int, mediaIDs []int, sensitive bool, spoilerText string, visibility string) (*Status, error) {
+func (mc *Client) PostStatus(text string, inReplyTo int, mediaIDs []int, sensitive bool, spoilerText string, visibility string) (*Status, error) {
 	var status Status
 	o := updateStatusOptions{
 		Status:      text,
@@ -178,7 +178,7 @@ func (g *Client) PostStatus(text string, inReplyTo int, mediaIDs []int, sensitiv
 		Visibility:  visibility,
 	}
 
-	err := g.updateStatusData("status", o, &status)
+	err := mc.updateStatusData("status", o, &status)
 	if err != nil {
 		return nil, err
 	}
@@ -189,41 +189,41 @@ func (g *Client) PostStatus(text string, inReplyTo int, mediaIDs []int, sensitiv
 }
 
 // DeleteStatus deletes a status
-func (g *Client) DeleteStatus(statusID int) error {
+func (mc *Client) DeleteStatus(statusID int) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
-	err := g.updateStatusData("delete", o, &status)
+	err := mc.updateStatusData("delete", o, &status)
 	return err
 }
 
 // ReblogStatus reblogs a status
-func (g *Client) ReblogStatus(statusID int) error {
+func (mc *Client) ReblogStatus(statusID int) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
-	err := g.updateStatusData("reblog", o, &status)
+	err := mc.updateStatusData("reblog", o, &status)
 	return err
 }
 
 // UnreblogStatus unreblogs a status
-func (g *Client) UnreblogStatus(statusID int) error {
+func (mc *Client) UnreblogStatus(statusID int) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
-	err := g.updateStatusData("unreblog", o, &status)
+	err := mc.updateStatusData("unreblog", o, &status)
 	return err
 }
 
 // FavouriteStatus favourites a status
-func (g *Client) FavouriteStatus(statusID int) error {
+func (mc *Client) FavouriteStatus(statusID int) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
-	err := g.updateStatusData("favourite", o, &status)
+	err := mc.updateStatusData("favourite", o, &status)
 	return err
 }
 
 // UnfavouriteStatus unfavourites a status
-func (g *Client) UnfavouriteStatus(statusID int) error {
+func (mc *Client) UnfavouriteStatus(statusID int) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
-	err := g.updateStatusData("unfavourite", o, &status)
+	err := mc.updateStatusData("unfavourite", o, &status)
 	return err
 }

@@ -4,7 +4,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"bufio"
@@ -33,7 +33,7 @@ type StreamEvent struct {
 // the stream.
 // The stream name can be "user", "public" or "hashtag".
 // For "hashtag", the hashTag argument cannot be empty.
-func (g *Client) openStream(streamName, hashTag string) (*http.Response, error) {
+func (mc *Client) openStream(streamName, hashTag string) (*http.Response, error) {
 	params := make(apiCallParams)
 
 	switch streamName {
@@ -47,7 +47,7 @@ func (g *Client) openStream(streamName, hashTag string) (*http.Response, error) 
 		return nil, ErrInvalidParameter
 	}
 
-	req, err := g.prepareRequest("streaming/"+streamName, rest.Get, params)
+	req, err := mc.prepareRequest("streaming/"+streamName, rest.Get, params)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build stream request: %s", err.Error())
 	}
@@ -71,7 +71,7 @@ func (g *Client) openStream(streamName, hashTag string) (*http.Response, error) 
 // readStream reads from the http.Response and sends events to the events channel
 // It stops when the connection is closed or when the stopCh channel is closed.
 // The foroutine will close the doneCh channel when it terminates.
-func (g *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, doneCh chan<- bool, r *http.Response) {
+func (mc *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, doneCh chan<- bool, r *http.Response) {
 	defer r.Body.Close()
 
 	reader := bufio.NewReader(r.Body)
@@ -184,15 +184,15 @@ func (g *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, doneC
 // The streaming is terminated if the 'stopCh' channel is closed.
 // The 'doneCh' channel is closed if the connection is closed by the server.
 // Please note that this method launches a goroutine to listen to the events.
-func (g *Client) StreamListener(name, hashTag string, events chan<- StreamEvent, stopCh <-chan bool, doneCh chan<- bool) error {
-	if g == nil {
-		return fmt.Errorf("use of uninitialized gondole client")
+func (mc *Client) StreamListener(name, hashTag string, events chan<- StreamEvent, stopCh <-chan bool, doneCh chan<- bool) error {
+	if mc == nil {
+		return ErrUninitializedClient
 	}
 
-	resp, err := g.openStream(name, hashTag)
+	resp, err := mc.openStream(name, hashTag)
 	if err != nil {
 		return err
 	}
-	go g.readStream(events, stopCh, doneCh, resp)
+	go mc.readStream(events, stopCh, doneCh, resp)
 	return nil
 }

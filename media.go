@@ -4,7 +4,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"bytes"
@@ -19,7 +19,7 @@ import (
 )
 
 // UploadMedia uploads the given file and returns an attachment
-func (g *Client) UploadMedia(filePath string) (*Attachment, error) {
+func (mc *Client) UploadMedia(filePath string) (*Attachment, error) {
 	var b bytes.Buffer
 
 	if filePath == "" {
@@ -43,7 +43,7 @@ func (g *Client) UploadMedia(filePath string) (*Attachment, error) {
 
 	w.Close()
 
-	req, err := g.prepareRequest("media", rest.Post, nil)
+	req, err := mc.prepareRequest("media", rest.Post, nil)
 	if err != nil {
 		return nil, fmt.Errorf("media prepareRequest failed: %s", err.Error())
 	}

@@ -5,13 +5,13 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"time"
 )
 
-// Client contains data for a gondole client application
+// Client contains data for a madon client application
 type Client struct {
 	Name        string // Name of the client
 	ID          string // Application ID
@@ -23,9 +23,7 @@ type Client struct {
 }
 
 /*
-Entities:
-
-Everything manipulated/returned by the API
+Entities - Everything manipulated/returned by the API
 */
 
 // Account represents a Mastodon account entity

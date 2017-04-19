@@ -4,7 +4,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"fmt"
@@ -14,16 +14,16 @@ import (
 )
 
 // GetReports returns the current user's reports
-func (g *Client) GetReports() ([]Report, error) {
+func (mc *Client) GetReports() ([]Report, error) {
 	var reports []Report
-	if err := g.apiCall("reports", rest.Get, nil, &reports); err != nil {
+	if err := mc.apiCall("reports", rest.Get, nil, &reports); err != nil {
 		return nil, err
 	}
 	return reports, nil
 }
 
 // ReportUser reports the user account
-func (g *Client) ReportUser(accountID int, statusIDs []int, comment string) (*Report, error) {
+func (mc *Client) ReportUser(accountID int, statusIDs []int, comment string) (*Report, error) {
 	if accountID < 1 || comment == "" || len(statusIDs) < 1 {
 		return nil, ErrInvalidParameter
 	}
@@ -40,7 +40,7 @@ func (g *Client) ReportUser(accountID int, statusIDs []int, comment string) (*Re
 	}
 
 	var report Report
-	if err := g.apiCall("reports", rest.Post, params, &report); err != nil {
+	if err := mc.apiCall("reports", rest.Post, params, &report); err != nil {
 		return nil, err
 	}
 	return &report, nil

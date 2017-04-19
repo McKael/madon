@@ -4,7 +4,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ import (
 // timeline can be "home", "public", or a hashtag (use ":hashtag" or "#hashtag")
 // For the public timelines, you can set 'local' to true to get only the
 // local instance.
-func (g *Client) GetTimelines(timeline string, local bool) ([]Status, error) {
+func (mc *Client) GetTimelines(timeline string, local bool) ([]Status, error) {
 	var endPoint string
 
 	switch {
@@ -39,7 +39,7 @@ func (g *Client) GetTimelines(timeline string, local bool) ([]Status, error) {
 	}
 
 	var tl []Status
-	if err := g.apiCall(endPoint, rest.Get, params, &tl); err != nil {
+	if err := mc.apiCall(endPoint, rest.Get, params, &tl); err != nil {
 		return nil, err
 	}
 	return tl, nil

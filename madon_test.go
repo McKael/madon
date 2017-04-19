@@ -1,4 +1,4 @@
-package gondole
+package madon
 
 import (
 	"testing"
@@ -8,14 +8,14 @@ import (
 )
 
 func TestPrepareRequest(t *testing.T) {
-	g := &Client{
+	mc := &Client{
 		Name:    "foo",
 		ID:      "666",
 		Secret:  "biiiip",
 		APIBase: "http://example.com",
 	}
 
-	req, err := g.prepareRequest("bar", rest.Get, nil)
+	req, err := mc.prepareRequest("bar", rest.Get, nil)
 	assert.NoError(t, err, "no error")
 	assert.NotNil(t, req.Headers, "not nil")
 }

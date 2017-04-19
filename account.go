@@ -4,7 +4,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ type getAccountsOptions struct {
 // "unfollow", "block", "unblock", "mute", "unmute",
 // "follow_requests/authorize" or // "follow_requests/reject".
 // The id is optional and depends on the operation.
-func (g *Client) getSingleAccount(op string, id int) (*Account, error) {
+func (mc *Client) getSingleAccount(op string, id int) (*Account, error) {
 	var endPoint string
 	method := rest.Get
 	strID := strconv.Itoa(id)
@@ -51,7 +51,7 @@ func (g *Client) getSingleAccount(op string, id int) (*Account, error) {
 	}
 
 	var account Account
-	if err := g.apiCall(endPoint, method, nil, &account); err != nil {
+	if err := mc.apiCall(endPoint, method, nil, &account); err != nil {
 		return nil, err
 	}
 	return &account, nil
@@ -61,7 +61,7 @@ func (g *Client) getSingleAccount(op string, id int) (*Account, error) {
 // The operation 'op' can be "followers", "following", "search", "blocks",
 // "mutes", "follow_requests".
 // The id is optional and depends on the operation.
-func (g *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Account, error) {
+func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Account, error) {
 	var endPoint string
 
 	switch op {
@@ -91,7 +91,7 @@ func (g *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Acc
 	}
 
 	var accounts []Account
-	if err := g.apiCall(endPoint, rest.Get, params, &accounts); err != nil {
+	if err := mc.apiCall(endPoint, rest.Get, params, &accounts); err != nil {
 		return nil, err
 	}
 	return accounts, nil
@@ -100,8 +100,8 @@ func (g *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Acc
 // GetAccount returns an account entity
 // The returned value can be nil if there is an error or if the
 // requested ID does not exist.
-func (g *Client) GetAccount(accountID int) (*Account, error) {
-	account, err := g.getSingleAccount("account", accountID)
+func (mc *Client) GetAccount(accountID int) (*Account, error) {
+	account, err := mc.getSingleAccount("account", accountID)
 	if err != nil {
 		return nil, err
 	}
@@ -112,8 +112,8 @@ func (g *Client) GetAccount(accountID int) (*Account, error) {
 }
 
 // GetCurrentAccount returns the current user account
-func (g *Client) GetCurrentAccount() (*Account, error) {
-	account, err := g.getSingleAccount("verify_credentials", 0)
+func (mc *Client) GetCurrentAccount() (*Account, error) {
+	account, err := mc.getSingleAccount("verify_credentials", 0)
 	if err != nil {
 		return nil, err
 	}
@@ -124,20 +124,20 @@ func (g *Client) GetCurrentAccount() (*Account, error) {
 }
 
 // GetAccountFollowers returns the list of accounts following a given account
-func (g *Client) GetAccountFollowers(accountID int) ([]Account, error) {
+func (mc *Client) GetAccountFollowers(accountID int) ([]Account, error) {
 	o := &getAccountsOptions{ID: accountID}
-	return g.getMultipleAccounts("followers", o)
+	return mc.getMultipleAccounts("followers", o)
 }
 
 // GetAccountFollowing returns the list of accounts a given account is following
-func (g *Client) GetAccountFollowing(accountID int) ([]Account, error) {
+func (mc *Client) GetAccountFollowing(accountID int) ([]Account, error) {
 	o := &getAccountsOptions{ID: accountID}
-	return g.getMultipleAccounts("following", o)
+	return mc.getMultipleAccounts("following", o)
 }
 
 // FollowAccount follows an account
-func (g *Client) FollowAccount(accountID int) error {
-	account, err := g.getSingleAccount("follow", accountID)
+func (mc *Client) FollowAccount(accountID int) error {
+	account, err := mc.getSingleAccount("follow", accountID)
 	if err != nil {
 		return err
 	}
@@ -148,8 +148,8 @@ func (g *Client) FollowAccount(accountID int) error {
 }
 
 // UnfollowAccount unfollows an account
-func (g *Client) UnfollowAccount(accountID int) error {
-	account, err := g.getSingleAccount("unfollow", accountID)
+func (mc *Client) UnfollowAccount(accountID int) error {
+	account, err := mc.getSingleAccount("unfollow", accountID)
 	if err != nil {
 		return err
 	}
@@ -160,8 +160,8 @@ func (g *Client) UnfollowAccount(accountID int) error {
 }
 
 // FollowRemoteAccount follows a remote account
-// The parameter 'uri' is a URI (e.g. "username@domain").
-func (g *Client) FollowRemoteAccount(uri string) (*Account, error) {
+// The parameter 'uri' is a URI (e.mc. "username@domain").
+func (mc *Client) FollowRemoteAccount(uri string) (*Account, error) {
 	if uri == "" {
 		return nil, ErrInvalidID
 	}
@@ -170,7 +170,7 @@ func (g *Client) FollowRemoteAccount(uri string) (*Account, error) {
 	params["uri"] = uri
 
 	var account Account
-	if err := g.apiCall("follows", rest.Post, params, &account); err != nil {
+	if err := mc.apiCall("follows", rest.Post, params, &account); err != nil {
 		return nil, err
 	}
 	if account.ID == 0 {
@@ -180,8 +180,8 @@ func (g *Client) FollowRemoteAccount(uri string) (*Account, error) {
 }
 
 // BlockAccount blocks an account
-func (g *Client) BlockAccount(accountID int) error {
-	account, err := g.getSingleAccount("block", accountID)
+func (mc *Client) BlockAccount(accountID int) error {
+	account, err := mc.getSingleAccount("block", accountID)
 	if err != nil {
 		return err
 	}
@@ -192,8 +192,8 @@ func (g *Client) BlockAccount(accountID int) error {
 }
 
 // UnblockAccount unblocks an account
-func (g *Client) UnblockAccount(accountID int) error {
-	account, err := g.getSingleAccount("unblock", accountID)
+func (mc *Client) UnblockAccount(accountID int) error {
+	account, err := mc.getSingleAccount("unblock", accountID)
 	if err != nil {
 		return err
 	}
@@ -204,8 +204,8 @@ func (g *Client) UnblockAccount(accountID int) error {
 }
 
 // MuteAccount mutes an account
-func (g *Client) MuteAccount(accountID int) error {
-	account, err := g.getSingleAccount("mute", accountID)
+func (mc *Client) MuteAccount(accountID int) error {
+	account, err := mc.getSingleAccount("mute", accountID)
 	if err != nil {
 		return err
 	}
@@ -216,8 +216,8 @@ func (g *Client) MuteAccount(accountID int) error {
 }
 
 // UnmuteAccount unmutes an account
-func (g *Client) UnmuteAccount(accountID int) error {
-	account, err := g.getSingleAccount("unmute", accountID)
+func (mc *Client) UnmuteAccount(accountID int) error {
+	account, err := mc.getSingleAccount("unmute", accountID)
 	if err != nil {
 		return err
 	}
@@ -229,28 +229,28 @@ func (g *Client) UnmuteAccount(accountID int) error {
 
 // SearchAccounts returns a list of accounts matching the query string
 // The limit parameter is optional (can be 0).
-func (g *Client) SearchAccounts(query string, limit int) ([]Account, error) {
+func (mc *Client) SearchAccounts(query string, limit int) ([]Account, error) {
 	o := &getAccountsOptions{Q: query, Limit: limit}
-	return g.getMultipleAccounts("search", o)
+	return mc.getMultipleAccounts("search", o)
 }
 
 // GetBlockedAccounts returns the list of blocked accounts
-func (g *Client) GetBlockedAccounts() ([]Account, error) {
-	return g.getMultipleAccounts("blocks", nil)
+func (mc *Client) GetBlockedAccounts() ([]Account, error) {
+	return mc.getMultipleAccounts("blocks", nil)
 }
 
 // GetMutedAccounts returns the list of muted accounts
-func (g *Client) GetMutedAccounts() ([]Account, error) {
-	return g.getMultipleAccounts("mutes", nil)
+func (mc *Client) GetMutedAccounts() ([]Account, error) {
+	return mc.getMultipleAccounts("mutes", nil)
 }
 
 // GetAccountFollowRequests returns the list of follow requests accounts
-func (g *Client) GetAccountFollowRequests() ([]Account, error) {
-	return g.getMultipleAccounts("follow_requests", nil)
+func (mc *Client) GetAccountFollowRequests() ([]Account, error) {
+	return mc.getMultipleAccounts("follow_requests", nil)
 }
 
 // GetAccountRelationships returns a list of relationship entities for the given accounts
-func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, error) {
+func (mc *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, error) {
 	if len(accountIDs) < 1 {
 		return nil, ErrInvalidID
 	}
@@ -265,7 +265,7 @@ func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, erro
 	}
 
 	var rl []Relationship
-	if err := g.apiCall("accounts/relationships", rest.Get, params, &rl); err != nil {
+	if err := mc.apiCall("accounts/relationships", rest.Get, params, &rl); err != nil {
 		return nil, err
 	}
 	return rl, nil
@@ -274,7 +274,7 @@ func (g *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, erro
 // GetAccountStatuses returns a list of status entities for the given account
 // If onlyMedia is true, returns only statuses that have media attachments.
 // If excludeReplies is true, skip statuses that reply to other statuses.
-func (g *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bool) ([]Status, error) {
+func (mc *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bool) ([]Status, error) {
 	if accountID < 1 {
 		return nil, ErrInvalidID
 	}
@@ -289,18 +289,18 @@ func (g *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies boo
 	}
 
 	var sl []Status
-	if err := g.apiCall(endPoint, rest.Get, params, &sl); err != nil {
+	if err := mc.apiCall(endPoint, rest.Get, params, &sl); err != nil {
 		return nil, err
 	}
 	return sl, nil
 }
 
 // FollowRequestAuthorize authorizes or rejects an account follow-request
-func (g *Client) FollowRequestAuthorize(accountID int, authorize bool) error {
+func (mc *Client) FollowRequestAuthorize(accountID int, authorize bool) error {
 	endPoint := "follow_requests/reject"
 	if authorize {
 		endPoint = "follow_requests/authorize"
 	}
-	_, err := g.getSingleAccount(endPoint, accountID)
+	_, err := mc.getSingleAccount(endPoint, accountID)
 	return err
 }

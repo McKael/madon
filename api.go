@@ -5,7 +5,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"bytes"
@@ -76,20 +76,20 @@ func restAPI(request rest.Request) (*rest.Response, error) {
 }
 
 // prepareRequest inserts all pre-defined stuff
-func (g *Client) prepareRequest(target string, method rest.Method, params apiCallParams) (rest.Request, error) {
+func (mc *Client) prepareRequest(target string, method rest.Method, params apiCallParams) (rest.Request, error) {
 	var req rest.Request
 
-	if g == nil {
-		return req, fmt.Errorf("use of uninitialized gondole client")
+	if mc == nil {
+		return req, ErrUninitializedClient
 	}
 
-	endPoint := g.APIBase + "/" + target
+	endPoint := mc.APIBase + "/" + target
 
 	// Request headers
 	hdrs := make(map[string]string)
-	hdrs["User-Agent"] = fmt.Sprintf("Gondole/%s", GondoleVersion)
-	if g.UserToken != nil {
-		hdrs["Authorization"] = fmt.Sprintf("Bearer %s", g.UserToken.AccessToken)
+	hdrs["User-Agent"] = fmt.Sprintf("madon/%s", MadonVersion)
+	if mc.UserToken != nil {
+		hdrs["Authorization"] = fmt.Sprintf("Bearer %s", mc.UserToken.AccessToken)
 	}
 
 	req = rest.Request{
@@ -102,13 +102,13 @@ func (g *Client) prepareRequest(target string, method rest.Method, params apiCal
 }
 
 // apiCall makes a call to the Mastodon API server
-func (g *Client) apiCall(endPoint string, method rest.Method, params apiCallParams, data interface{}) error {
-	if g == nil {
-		return fmt.Errorf("use of uninitialized gondole client")
+func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallParams, data interface{}) error {
+	if mc == nil {
+		return fmt.Errorf("use of uninitialized madon client")
 	}
 
 	// Prepare query
-	req, err := g.prepareRequest(endPoint, method, params)
+	req, err := mc.prepareRequest(endPoint, method, params)
 	if err != nil {
 		return err
 	}

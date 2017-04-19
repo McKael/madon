@@ -5,7 +5,7 @@ Copyright 2017 Mikael Berthe
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
 
-package gondole
+package madon
 
 import (
 	"errors"
@@ -15,8 +15,8 @@ import (
 type apiCallParams map[string]string
 
 const (
-	// GondoleVersion contains the version of the Gondole implementation
-	GondoleVersion = "0.1"
+	// MadonVersion contains the version of the Madon library
+	MadonVersion = "0.2"
 
 	// API version implemented in this library
 	apiVersion     = "v1"
@@ -28,8 +28,9 @@ const (
 
 // Error codes
 var (
-	ErrAlreadyRegistered = errors.New("app already registered")
-	ErrEntityNotFound    = errors.New("entity not found")
-	ErrInvalidParameter  = errors.New("incorrect parameter")
-	ErrInvalidID         = errors.New("incorrect entity ID")
+	ErrUninitializedClient = errors.New("use of uninitialized madon client")
+	ErrAlreadyRegistered   = errors.New("app already registered")
+	ErrEntityNotFound      = errors.New("entity not found")
+	ErrInvalidParameter    = errors.New("incorrect parameter")
+	ErrInvalidID           = errors.New("incorrect entity ID")
 )
