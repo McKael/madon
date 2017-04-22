@@ -7,8 +7,15 @@ Licensed under the MIT license.  Please see the LICENSE file is this directory.
 package madon
 
 import (
+	"bytes"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"mime/multipart"
+	"net/http"
+	"os"
 	"strconv"
+	"strings"
 
 	"github.com/sendgrid/rest"
 )
@@ -303,4 +310,121 @@ func (mc *Client) FollowRequestAuthorize(accountID int, authorize bool) error {
 	}
 	_, err := mc.getSingleAccount(endPoint, accountID)
 	return err
+}
+
+// UpdateAccount updates the connected user's account data
+// The fields avatar & headerImage can contain base64-encoded images; if
+// they do not (that is; if they don't contain ";base64,"), they are considered
+// as file paths and their content will be encoded.
+// All fields can be nil, in which case they are not updated.
+// displayName and note can be set to "" to delete previous values;
+// I'm not sure images can be deleted -- only replaced AFAICS.
+func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string) (*Account, error) {
+	const endPoint = "accounts/update_credentials"
+	params := make(apiCallParams)
+
+	if displayName != nil {
+		params["display_name"] = *displayName
+	}
+	if note != nil {
+		params["note"] = *note
+	}
+
+	var err error
+	avatar, err = fileToBase64(avatar, nil)
+	if err != nil {
+		return nil, err
+	}
+	headerImage, err = fileToBase64(headerImage, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var formBuf bytes.Buffer
+	w := multipart.NewWriter(&formBuf)
+
+	if avatar != nil {
+		w.WriteField("avatar", *avatar)
+	}
+	if headerImage != nil {
+		w.WriteField("header", *headerImage)
+	}
+	w.Close()
+
+	// Prepare the request
+	req, err := mc.prepareRequest(endPoint, rest.Patch, params)
+	if err != nil {
+		return nil, fmt.Errorf("prepareRequest failed: %s", err.Error())
+	}
+	req.Headers["Content-Type"] = w.FormDataContentType()
+	req.Body = formBuf.Bytes()
+
+	// Make API call
+	r, err := restAPI(req)
+	if err != nil {
+		return nil, fmt.Errorf("account update failed: %s", err.Error())
+	}
+
+	// Check for error reply
+	var errorResult Error
+	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
+		// The empty object is not an error
+		if errorResult.Text != "" {
+			return nil, fmt.Errorf("%s", errorResult.Text)
+		}
+	}
+
+	// Not an error reply; let's unmarshal the data
+	var account Account
+	if err := json.Unmarshal([]byte(r.Body), &account); err != nil {
+		return nil, fmt.Errorf("cannot decode API response: %s", err.Error())
+	}
+	return &account, nil
+}
+
+// fileToBase64 is a helper function to convert a file's contents to
+// base64-encoded data.  Is the data string already contains base64 data, it
+// is not modified.
+// If contentType is nil, it is detected.
+func fileToBase64(data, contentType *string) (*string, error) {
+	if data == nil {
+		return nil, nil
+	}
+
+	if *data == "" {
+		return data, nil
+	}
+
+	if strings.Contains(*data, ";base64,") {
+		return data, nil
+	}
+
+	// We need to convert the file and file name to base64
+
+	file, err := os.Open(*data)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fStat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	buffer := make([]byte, fStat.Size())
+	_, err = file.Read(buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	var cType string
+	if contentType == nil || *contentType == "" {
+		cType = http.DetectContentType(buffer[:512])
+	} else {
+		cType = *contentType
+	}
+	contentData := base64.StdEncoding.EncodeToString(buffer)
+	newData := "data:" + cType + ";base64," + contentData
+	return &newData, nil
 }
