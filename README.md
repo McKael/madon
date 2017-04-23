@@ -15,7 +15,7 @@ The [madonctl](https://github.com/McKael/madonctl) console client uses this libr
 
 ## Installation
 
-To install the library:
+To install the library (Go >= v1.5 required):
 
     go get github.com/McKael/madon
 
