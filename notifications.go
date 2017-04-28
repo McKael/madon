@@ -40,6 +40,17 @@ func (mc *Client) GetNotification(notificationID int) (*Notification, error) {
 	return &notification, nil
 }
 
+// DismissNotification deletes a notification
+func (mc *Client) DismissNotification(notificationID int) error {
+	if notificationID < 1 {
+		return ErrInvalidID
+	}
+
+	endPoint := "notifications/dismiss"
+	params := apiCallParams{"id": strconv.Itoa(notificationID)}
+	return mc.apiCall(endPoint, rest.Post, params, &Notification{})
+}
+
 // ClearNotifications deletes all notifications from the Mastodon server for
 // the authenticated user
 func (mc *Client) ClearNotifications() error {
