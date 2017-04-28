@@ -84,6 +84,7 @@ type Instance struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Email       string `json:"email"`
+	Version     string `json:"version"`
 }
 
 // Mention represents a Mastodon mention entity
