@@ -111,15 +111,15 @@ func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallPar
 	if limitOptions != nil {
 		if params == nil {
 			params = make(apiCallParams)
-			if limitOptions.Limit > 0 {
-				params["limit"] = strconv.Itoa(limitOptions.Limit)
-			}
-			if limitOptions.SinceID > 0 {
-				params["since_id"] = strconv.Itoa(limitOptions.SinceID)
-			}
-			if limitOptions.MaxID > 0 {
-				params["max_id"] = strconv.Itoa(limitOptions.MaxID)
-			}
+		}
+		if limitOptions.Limit > 0 {
+			params["limit"] = strconv.Itoa(limitOptions.Limit)
+		}
+		if limitOptions.SinceID > 0 {
+			params["since_id"] = strconv.Itoa(limitOptions.SinceID)
+		}
+		if limitOptions.MaxID > 0 {
+			params["max_id"] = strconv.Itoa(limitOptions.MaxID)
 		}
 	}
 
