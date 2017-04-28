@@ -13,9 +13,9 @@ import (
 )
 
 // GetNotifications returns the list of the user's notifications
-func (mc *Client) GetNotifications() ([]Notification, error) {
+func (mc *Client) GetNotifications(lopt *LimitParams) ([]Notification, error) {
 	var notifications []Notification
-	if err := mc.apiCall("notifications", rest.Get, nil, &notifications); err != nil {
+	if err := mc.apiCall("notifications", rest.Get, nil, lopt, &notifications); err != nil {
 		return nil, err
 	}
 	return notifications, nil
@@ -31,7 +31,7 @@ func (mc *Client) GetNotification(notificationID int) (*Notification, error) {
 
 	var endPoint = "notifications/" + strconv.Itoa(notificationID)
 	var notification Notification
-	if err := mc.apiCall(endPoint, rest.Get, nil, &notification); err != nil {
+	if err := mc.apiCall(endPoint, rest.Get, nil, nil, &notification); err != nil {
 		return nil, err
 	}
 	if notification.ID == 0 {
@@ -48,11 +48,11 @@ func (mc *Client) DismissNotification(notificationID int) error {
 
 	endPoint := "notifications/dismiss"
 	params := apiCallParams{"id": strconv.Itoa(notificationID)}
-	return mc.apiCall(endPoint, rest.Post, params, &Notification{})
+	return mc.apiCall(endPoint, rest.Post, params, nil, &Notification{})
 }
 
 // ClearNotifications deletes all notifications from the Mastodon server for
 // the authenticated user
 func (mc *Client) ClearNotifications() error {
-	return mc.apiCall("notifications/clear", rest.Post, nil, &Notification{})
+	return mc.apiCall("notifications/clear", rest.Post, nil, nil, &Notification{})
 }

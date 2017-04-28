@@ -68,7 +68,7 @@ func NewApp(name string, scopes []string, redirectURI, instanceName string) (mc 
 	}
 
 	var app registerApp
-	if err := mc.apiCall("apps", rest.Post, params, &app); err != nil {
+	if err := mc.apiCall("apps", rest.Post, params, nil, &app); err != nil {
 		return nil, err
 	}
 

@@ -25,9 +25,10 @@ type getAccountsOptions struct {
 	// The ID is used for most commands
 	ID int
 
-	// The following fields are used when searching for accounts
-	Q     string
-	Limit int
+	// The Q field (query) is used when searching for accounts
+	Q string
+
+	Limit *LimitParams
 }
 
 // getSingleAccount returns an account entity
@@ -58,7 +59,7 @@ func (mc *Client) getSingleAccount(op string, id int) (*Account, error) {
 	}
 
 	var account Account
-	if err := mc.apiCall(endPoint, method, nil, &account); err != nil {
+	if err := mc.apiCall(endPoint, method, nil, nil, &account); err != nil {
 		return nil, err
 	}
 	return &account, nil
@@ -70,6 +71,11 @@ func (mc *Client) getSingleAccount(op string, id int) (*Account, error) {
 // The id is optional and depends on the operation.
 func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Account, error) {
 	var endPoint string
+	var lopt *LimitParams
+
+	if opts != nil {
+		lopt = opts.Limit
+	}
 
 	switch op {
 	case "followers", "following":
@@ -92,13 +98,10 @@ func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Ac
 	params := make(apiCallParams)
 	if op == "search" {
 		params["q"] = opts.Q
-		if opts.Limit > 0 {
-			params["limit"] = strconv.Itoa(opts.Limit)
-		}
 	}
 
 	var accounts []Account
-	if err := mc.apiCall(endPoint, rest.Get, params, &accounts); err != nil {
+	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &accounts); err != nil {
 		return nil, err
 	}
 	return accounts, nil
@@ -131,13 +134,13 @@ func (mc *Client) GetCurrentAccount() (*Account, error) {
 }
 
 // GetAccountFollowers returns the list of accounts following a given account
-func (mc *Client) GetAccountFollowers(accountID int) ([]Account, error) {
+func (mc *Client) GetAccountFollowers(accountID int, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: accountID}
 	return mc.getMultipleAccounts("followers", o)
 }
 
 // GetAccountFollowing returns the list of accounts a given account is following
-func (mc *Client) GetAccountFollowing(accountID int) ([]Account, error) {
+func (mc *Client) GetAccountFollowing(accountID int, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: accountID}
 	return mc.getMultipleAccounts("following", o)
 }
@@ -177,7 +180,7 @@ func (mc *Client) FollowRemoteAccount(uri string) (*Account, error) {
 	params["uri"] = uri
 
 	var account Account
-	if err := mc.apiCall("follows", rest.Post, params, &account); err != nil {
+	if err := mc.apiCall("follows", rest.Post, params, nil, &account); err != nil {
 		return nil, err
 	}
 	if account.ID == 0 {
@@ -235,24 +238,24 @@ func (mc *Client) UnmuteAccount(accountID int) error {
 }
 
 // SearchAccounts returns a list of accounts matching the query string
-// The limit parameter is optional (can be 0).
-func (mc *Client) SearchAccounts(query string, limit int) ([]Account, error) {
-	o := &getAccountsOptions{Q: query, Limit: limit}
+// The lopt parameter is optional (can be nil) or can be used to set a limit.
+func (mc *Client) SearchAccounts(query string, lopt *LimitParams) ([]Account, error) {
+	o := &getAccountsOptions{Q: query, Limit: lopt}
 	return mc.getMultipleAccounts("search", o)
 }
 
 // GetBlockedAccounts returns the list of blocked accounts
-func (mc *Client) GetBlockedAccounts() ([]Account, error) {
+func (mc *Client) GetBlockedAccounts(lopt *LimitParams) ([]Account, error) {
 	return mc.getMultipleAccounts("blocks", nil)
 }
 
 // GetMutedAccounts returns the list of muted accounts
-func (mc *Client) GetMutedAccounts() ([]Account, error) {
+func (mc *Client) GetMutedAccounts(lopt *LimitParams) ([]Account, error) {
 	return mc.getMultipleAccounts("mutes", nil)
 }
 
 // GetAccountFollowRequests returns the list of follow requests accounts
-func (mc *Client) GetAccountFollowRequests() ([]Account, error) {
+func (mc *Client) GetAccountFollowRequests(lopt *LimitParams) ([]Account, error) {
 	return mc.getMultipleAccounts("follow_requests", nil)
 }
 
@@ -272,7 +275,7 @@ func (mc *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, err
 	}
 
 	var rl []Relationship
-	if err := mc.apiCall("accounts/relationships", rest.Get, params, &rl); err != nil {
+	if err := mc.apiCall("accounts/relationships", rest.Get, params, nil, &rl); err != nil {
 		return nil, err
 	}
 	return rl, nil
@@ -281,7 +284,7 @@ func (mc *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, err
 // GetAccountStatuses returns a list of status entities for the given account
 // If onlyMedia is true, returns only statuses that have media attachments.
 // If excludeReplies is true, skip statuses that reply to other statuses.
-func (mc *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bool) ([]Status, error) {
+func (mc *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bool, lopt *LimitParams) ([]Status, error) {
 	if accountID < 1 {
 		return nil, ErrInvalidID
 	}
@@ -296,7 +299,7 @@ func (mc *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bo
 	}
 
 	var sl []Status
-	if err := mc.apiCall(endPoint, rest.Get, params, &sl); err != nil {
+	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &sl); err != nil {
 		return nil, err
 	}
 	return sl, nil

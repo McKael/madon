@@ -23,7 +23,7 @@ func (mc *Client) Search(query string, resolve bool) (*Results, error) {
 	}
 
 	var results Results
-	if err := mc.apiCall("search", rest.Get, params, &results); err != nil {
+	if err := mc.apiCall("search", rest.Get, params, nil, &results); err != nil {
 		return nil, err
 	}
 	return &results, nil

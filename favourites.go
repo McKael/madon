@@ -11,9 +11,9 @@ import (
 )
 
 // GetFavourites returns the list of the user's favourites
-func (mc *Client) GetFavourites() ([]Status, error) {
+func (mc *Client) GetFavourites(lopt *LimitParams) ([]Status, error) {
 	var faves []Status
-	err := mc.apiCall("favourites", rest.Get, nil, &faves)
+	err := mc.apiCall("favourites", rest.Get, nil, lopt, &faves)
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,7 @@ import (
 // timeline can be "home", "public", or a hashtag (use ":hashtag" or "#hashtag")
 // For the public timelines, you can set 'local' to true to get only the
 // local instance.
-func (mc *Client) GetTimelines(timeline string, local bool) ([]Status, error) {
+func (mc *Client) GetTimelines(timeline string, local bool, lopt *LimitParams) ([]Status, error) {
 	var endPoint string
 
 	switch {
@@ -39,7 +39,7 @@ func (mc *Client) GetTimelines(timeline string, local bool) ([]Status, error) {
 	}
 
 	var tl []Status
-	if err := mc.apiCall(endPoint, rest.Get, params, &tl); err != nil {
+	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &tl); err != nil {
 		return nil, err
 	}
 	return tl, nil

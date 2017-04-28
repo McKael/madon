@@ -11,6 +11,11 @@ import (
 	"errors"
 )
 
+// LimitParams contains common limit/paging options for the Mastodon REST API
+type LimitParams struct {
+	SinceID, MaxID, Limit int
+}
+
 // apiCallParams is a map with the parameters for an API call
 type apiCallParams map[string]string
 

@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/sendgrid/rest"
@@ -102,9 +103,24 @@ func (mc *Client) prepareRequest(target string, method rest.Method, params apiCa
 }
 
 // apiCall makes a call to the Mastodon API server
-func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallParams, data interface{}) error {
+func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallParams, limitOptions *LimitParams, data interface{}) error {
 	if mc == nil {
 		return fmt.Errorf("use of uninitialized madon client")
+	}
+
+	if limitOptions != nil {
+		if params == nil {
+			params = make(apiCallParams)
+			if limitOptions.Limit > 0 {
+				params["limit"] = strconv.Itoa(limitOptions.Limit)
+			}
+			if limitOptions.SinceID > 0 {
+				params["since_id"] = strconv.Itoa(limitOptions.SinceID)
+			}
+			if limitOptions.MaxID > 0 {
+				params["max_id"] = strconv.Itoa(limitOptions.MaxID)
+			}
+		}
 	}
 
 	// Prepare query
