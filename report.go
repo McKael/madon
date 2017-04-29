@@ -16,7 +16,7 @@ import (
 // GetReports returns the current user's reports
 func (mc *Client) GetReports(lopt *LimitParams) ([]Report, error) {
 	var reports []Report
-	if err := mc.apiCall("reports", rest.Get, nil, lopt, &reports); err != nil {
+	if err := mc.apiCall("reports", rest.Get, nil, lopt, nil, &reports); err != nil {
 		return nil, err
 	}
 	return reports, nil
@@ -40,7 +40,7 @@ func (mc *Client) ReportUser(accountID int, statusIDs []int, comment string) (*R
 	}
 
 	var report Report
-	if err := mc.apiCall("reports", rest.Post, params, nil, &report); err != nil {
+	if err := mc.apiCall("reports", rest.Post, params, nil, nil, &report); err != nil {
 		return nil, err
 	}
 	return &report, nil

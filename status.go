@@ -48,7 +48,7 @@ func (mc *Client) queryStatusData(statusID int, op string, data interface{}) err
 		endPoint += "/" + op
 	}
 
-	return mc.apiCall(endPoint, rest.Get, nil, nil, data)
+	return mc.apiCall(endPoint, rest.Get, nil, nil, nil, data)
 }
 
 // updateStatusData updates the statuses
@@ -114,7 +114,7 @@ func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data int
 		}
 	}
 
-	return mc.apiCall(endPoint, method, params, nil, data)
+	return mc.apiCall(endPoint, method, params, nil, nil, data)
 }
 
 // GetStatus returns a status
@@ -152,16 +152,14 @@ func (mc *Client) GetStatusCard(statusID int) (*Card, error) {
 
 // GetStatusRebloggedBy returns a list of the accounts who reblogged a status
 func (mc *Client) GetStatusRebloggedBy(statusID int, lopt *LimitParams) ([]Account, error) {
-	var accounts []Account
-	err := mc.queryStatusData(statusID, "reblogged_by", &accounts)
-	return accounts, err
+	o := &getAccountsOptions{ID: statusID, Limit: lopt}
+	return mc.getMultipleAccounts("reblogged_by", o)
 }
 
 // GetStatusFavouritedBy returns a list of the accounts who favourited a status
 func (mc *Client) GetStatusFavouritedBy(statusID int, lopt *LimitParams) ([]Account, error) {
-	var accounts []Account
-	err := mc.queryStatusData(statusID, "favourited_by", &accounts)
-	return accounts, err
+	o := &getAccountsOptions{ID: statusID, Limit: lopt}
+	return mc.getMultipleAccounts("favourited_by", o)
 }
 
 // PostStatus posts a new "toot"

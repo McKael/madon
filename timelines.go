@@ -39,8 +39,21 @@ func (mc *Client) GetTimelines(timeline string, local bool, lopt *LimitParams) (
 	}
 
 	var tl []Status
-	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &tl); err != nil {
+	var links apiLinks
+	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &links, &tl); err != nil {
 		return nil, err
+	}
+	if lopt != nil { // Fetch more pages to reach our limit
+		var statusSlice []Status
+		for lopt.Limit > len(tl) && links.next != nil {
+			newlopt := links.next
+			links = apiLinks{}
+			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &statusSlice); err != nil {
+				return nil, err
+			}
+			tl = append(tl, statusSlice...)
+			statusSlice = statusSlice[:0] // Clear struct
+		}
 	}
 	return tl, nil
 }

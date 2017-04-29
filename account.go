@@ -59,7 +59,7 @@ func (mc *Client) getSingleAccount(op string, id int) (*Account, error) {
 	}
 
 	var account Account
-	if err := mc.apiCall(endPoint, method, nil, nil, &account); err != nil {
+	if err := mc.apiCall(endPoint, method, nil, nil, nil, &account); err != nil {
 		return nil, err
 	}
 	return &account, nil
@@ -90,6 +90,11 @@ func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Ac
 			return []Account{}, ErrInvalidParameter
 		}
 		endPoint = "accounts/" + op
+	case "reblogged_by", "favourited_by":
+		if opts == nil || opts.ID < 1 {
+			return []Account{}, ErrInvalidID
+		}
+		endPoint = "statuses/" + strconv.Itoa(opts.ID) + "/" + op
 	default:
 		return nil, ErrInvalidParameter
 	}
@@ -101,8 +106,21 @@ func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Ac
 	}
 
 	var accounts []Account
-	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &accounts); err != nil {
+	var links apiLinks
+	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &links, &accounts); err != nil {
 		return nil, err
+	}
+	if lopt != nil { // Fetch more pages to reach our limit
+		var accountSlice []Account
+		for lopt.Limit > len(accounts) && links.next != nil {
+			newlopt := links.next
+			links = apiLinks{}
+			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &accountSlice); err != nil {
+				return nil, err
+			}
+			accounts = append(accounts, accountSlice...)
+			accountSlice = accountSlice[:0] // Clear struct
+		}
 	}
 	return accounts, nil
 }
@@ -180,7 +198,7 @@ func (mc *Client) FollowRemoteAccount(uri string) (*Account, error) {
 	params["uri"] = uri
 
 	var account Account
-	if err := mc.apiCall("follows", rest.Post, params, nil, &account); err != nil {
+	if err := mc.apiCall("follows", rest.Post, params, nil, nil, &account); err != nil {
 		return nil, err
 	}
 	if account.ID == 0 {
@@ -281,7 +299,7 @@ func (mc *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, err
 	}
 
 	var rl []Relationship
-	if err := mc.apiCall("accounts/relationships", rest.Get, params, nil, &rl); err != nil {
+	if err := mc.apiCall("accounts/relationships", rest.Get, params, nil, nil, &rl); err != nil {
 		return nil, err
 	}
 	return rl, nil
@@ -305,8 +323,21 @@ func (mc *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bo
 	}
 
 	var sl []Status
-	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &sl); err != nil {
+	var links apiLinks
+	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &links, &sl); err != nil {
 		return nil, err
+	}
+	if lopt != nil { // Fetch more pages to reach our limit
+		var statusSlice []Status
+		for lopt.Limit > len(sl) && links.next != nil {
+			newlopt := links.next
+			links = apiLinks{}
+			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &statusSlice); err != nil {
+				return nil, err
+			}
+			sl = append(sl, statusSlice...)
+			statusSlice = statusSlice[:0] // Clear struct
+		}
 	}
 	return sl, nil
 }

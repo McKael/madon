@@ -13,7 +13,7 @@ import (
 // GetCurrentInstance returns current instance information
 func (mc *Client) GetCurrentInstance() (*Instance, error) {
 	var i Instance
-	if err := mc.apiCall("instance", rest.Get, nil, nil, &i); err != nil {
+	if err := mc.apiCall("instance", rest.Get, nil, nil, nil, &i); err != nil {
 		return nil, err
 	}
 	return &i, nil

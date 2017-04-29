@@ -15,8 +15,21 @@ import (
 // GetNotifications returns the list of the user's notifications
 func (mc *Client) GetNotifications(lopt *LimitParams) ([]Notification, error) {
 	var notifications []Notification
-	if err := mc.apiCall("notifications", rest.Get, nil, lopt, &notifications); err != nil {
+	var links apiLinks
+	if err := mc.apiCall("notifications", rest.Get, nil, lopt, &links, &notifications); err != nil {
 		return nil, err
+	}
+	if lopt != nil { // Fetch more pages to reach our limit
+		var notifSlice []Notification
+		for lopt.Limit > len(notifications) && links.next != nil {
+			newlopt := links.next
+			links = apiLinks{}
+			if err := mc.apiCall("notifications", rest.Get, nil, newlopt, &links, &notifSlice); err != nil {
+				return nil, err
+			}
+			notifications = append(notifications, notifSlice...)
+			notifSlice = notifSlice[:0] // Clear struct
+		}
 	}
 	return notifications, nil
 }
@@ -31,7 +44,7 @@ func (mc *Client) GetNotification(notificationID int) (*Notification, error) {
 
 	var endPoint = "notifications/" + strconv.Itoa(notificationID)
 	var notification Notification
-	if err := mc.apiCall(endPoint, rest.Get, nil, nil, &notification); err != nil {
+	if err := mc.apiCall(endPoint, rest.Get, nil, nil, nil, &notification); err != nil {
 		return nil, err
 	}
 	if notification.ID == 0 {
@@ -48,11 +61,13 @@ func (mc *Client) DismissNotification(notificationID int) error {
 
 	endPoint := "notifications/dismiss"
 	params := apiCallParams{"id": strconv.Itoa(notificationID)}
-	return mc.apiCall(endPoint, rest.Post, params, nil, &Notification{})
+	err := mc.apiCall(endPoint, rest.Post, params, nil, nil, &Notification{})
+	return err
 }
 
 // ClearNotifications deletes all notifications from the Mastodon server for
 // the authenticated user
 func (mc *Client) ClearNotifications() error {
-	return mc.apiCall("notifications/clear", rest.Post, nil, nil, &Notification{})
+	err := mc.apiCall("notifications/clear", rest.Post, nil, nil, nil, &Notification{})
+	return err
 }

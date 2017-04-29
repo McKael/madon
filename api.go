@@ -13,11 +13,71 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/sendgrid/rest"
 )
+
+type apiLinks struct {
+	next, prev *LimitParams
+}
+
+func parseLink(links []string) (*apiLinks, error) {
+	if len(links) == 0 {
+		return nil, nil
+	}
+
+	al := new(apiLinks)
+	linkRegex := regexp.MustCompile(`<([^>]+)>; rel="([^"]+)`)
+	for _, l := range links {
+		m := linkRegex.FindAllStringSubmatch(l, -1)
+		for _, submatch := range m {
+			if len(submatch) != 3 {
+				continue
+			}
+			// Parse URL
+			u, err := url.Parse(submatch[1])
+			if err != nil {
+				return al, err
+			}
+			var lp *LimitParams
+			since := u.Query().Get("since_id")
+			max := u.Query().Get("max_id")
+			lim := u.Query().Get("limit")
+			if since == "" && max == "" {
+				continue
+			}
+			lp = new(LimitParams)
+			if since != "" {
+				lp.SinceID, err = strconv.Atoi(since)
+				if err != nil {
+					return al, err
+				}
+			}
+			if max != "" {
+				lp.MaxID, err = strconv.Atoi(max)
+				if err != nil {
+					return al, err
+				}
+			}
+			if lim != "" {
+				lp.Limit, err = strconv.Atoi(lim)
+				if err != nil {
+					return al, err
+				}
+			}
+			switch submatch[2] {
+			case "prev":
+				al.prev = lp
+			case "next":
+				al.next = lp
+			}
+		}
+	}
+	return al, nil
+}
 
 // restAPI actually does the HTTP query
 // It is a copy of rest.API with better handling of parameters with multiple values
@@ -103,7 +163,9 @@ func (mc *Client) prepareRequest(target string, method rest.Method, params apiCa
 }
 
 // apiCall makes a call to the Mastodon API server
-func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallParams, limitOptions *LimitParams, data interface{}) error {
+// If links is not nil, the prev/next links from the API response headers
+// will be set (if they exist) in the structure.
+func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallParams, limitOptions *LimitParams, links *apiLinks, data interface{}) error {
 	if mc == nil {
 		return fmt.Errorf("use of uninitialized madon client")
 	}
@@ -133,6 +195,16 @@ func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallPar
 	r, err := restAPI(req)
 	if err != nil {
 		return fmt.Errorf("API query (%s) failed: %s", endPoint, err.Error())
+	}
+
+	if links != nil {
+		pLinks, err := parseLink(r.Headers["Link"])
+		if err != nil {
+			return fmt.Errorf("cannot decode header links (%s): %s", method, err.Error())
+		}
+		if pLinks != nil {
+			*links = *pLinks
+		}
 	}
 
 	// Check for error reply
