@@ -11,6 +11,10 @@ import (
 )
 
 // GetFavourites returns the list of the user's favourites
+// If lopt.All is true, several requests will be made until the API server
+// has nothing to return.
+// If lopt.Limit is set (and not All), several queries can be made until the
+// limit is reached.
 func (mc *Client) GetFavourites(lopt *LimitParams) ([]Status, error) {
 	var faves []Status
 	var links apiLinks
@@ -20,7 +24,7 @@ func (mc *Client) GetFavourites(lopt *LimitParams) ([]Status, error) {
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
 		var faveSlice []Status
-		for lopt.Limit > len(faves) && links.next != nil {
+		for (lopt.All || lopt.Limit > len(faves)) && links.next != nil {
 			newlopt := links.next
 			links = apiLinks{}
 			if err := mc.apiCall("favourites", rest.Get, nil, newlopt, &links, &faveSlice); err != nil {

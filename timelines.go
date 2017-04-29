@@ -17,6 +17,10 @@ import (
 // timeline can be "home", "public", or a hashtag (use ":hashtag" or "#hashtag")
 // For the public timelines, you can set 'local' to true to get only the
 // local instance.
+// If lopt.All is true, several requests will be made until the API server
+// has nothing to return.
+// If lopt.Limit is set (and not All), several queries can be made until the
+// limit is reached.
 func (mc *Client) GetTimelines(timeline string, local bool, lopt *LimitParams) ([]Status, error) {
 	var endPoint string
 
@@ -45,7 +49,7 @@ func (mc *Client) GetTimelines(timeline string, local bool, lopt *LimitParams) (
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
 		var statusSlice []Status
-		for lopt.Limit > len(tl) && links.next != nil {
+		for (lopt.All || lopt.Limit > len(tl)) && links.next != nil {
 			newlopt := links.next
 			links = apiLinks{}
 			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &statusSlice); err != nil {

@@ -69,6 +69,8 @@ func (mc *Client) getSingleAccount(op string, id int) (*Account, error) {
 // The operation 'op' can be "followers", "following", "search", "blocks",
 // "mutes", "follow_requests".
 // The id is optional and depends on the operation.
+// If opts.All is true, several requests will be made until the API server
+// has nothing to return.
 func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Account, error) {
 	var endPoint string
 	var lopt *LimitParams
@@ -112,7 +114,7 @@ func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Ac
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
 		var accountSlice []Account
-		for lopt.Limit > len(accounts) && links.next != nil {
+		for (lopt.All || lopt.Limit > len(accounts)) && links.next != nil {
 			newlopt := links.next
 			links = apiLinks{}
 			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &accountSlice); err != nil {
@@ -308,6 +310,10 @@ func (mc *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, err
 // GetAccountStatuses returns a list of status entities for the given account
 // If onlyMedia is true, returns only statuses that have media attachments.
 // If excludeReplies is true, skip statuses that reply to other statuses.
+// If lopt.All is true, several requests will be made until the API server
+// has nothing to return.
+// If lopt.Limit is set (and not All), several queries can be made until the
+// limit is reached.
 func (mc *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bool, lopt *LimitParams) ([]Status, error) {
 	if accountID < 1 {
 		return nil, ErrInvalidID
@@ -329,7 +335,7 @@ func (mc *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bo
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
 		var statusSlice []Status
-		for lopt.Limit > len(sl) && links.next != nil {
+		for (lopt.All || lopt.Limit > len(sl)) && links.next != nil {
 			newlopt := links.next
 			links = apiLinks{}
 			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &statusSlice); err != nil {

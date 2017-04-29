@@ -14,6 +14,7 @@ import (
 )
 
 // GetReports returns the current user's reports
+// (I don't know if the limit options are used by the API server.)
 func (mc *Client) GetReports(lopt *LimitParams) ([]Report, error) {
 	var reports []Report
 	if err := mc.apiCall("reports", rest.Get, nil, lopt, nil, &reports); err != nil {

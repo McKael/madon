@@ -13,7 +13,9 @@ import (
 
 // LimitParams contains common limit/paging options for the Mastodon REST API
 type LimitParams struct {
-	SinceID, MaxID, Limit int
+	Limit          int  // Number of items per query
+	SinceID, MaxID int  // Boundaries
+	All            bool // Get as many items as possible
 }
 
 // apiCallParams is a map with the parameters for an API call

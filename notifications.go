@@ -13,6 +13,10 @@ import (
 )
 
 // GetNotifications returns the list of the user's notifications
+// If lopt.All is true, several requests will be made until the API server
+// has nothing to return.
+// If lopt.Limit is set (and not All), several queries can be made until the
+// limit is reached.
 func (mc *Client) GetNotifications(lopt *LimitParams) ([]Notification, error) {
 	var notifications []Notification
 	var links apiLinks
@@ -21,7 +25,7 @@ func (mc *Client) GetNotifications(lopt *LimitParams) ([]Notification, error) {
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
 		var notifSlice []Notification
-		for lopt.Limit > len(notifications) && links.next != nil {
+		for (lopt.All || lopt.Limit > len(notifications)) && links.next != nil {
 			newlopt := links.next
 			links = apiLinks{}
 			if err := mc.apiCall("notifications", rest.Get, nil, newlopt, &links, &notifSlice); err != nil {
