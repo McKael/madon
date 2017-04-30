@@ -7,8 +7,9 @@ Licensed under the MIT license.  Please see the LICENSE file is this directory.
 package madon
 
 import (
-	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // GetTimelines returns a timeline (a list of statuses
@@ -28,11 +29,11 @@ func (mc *Client) GetTimelines(timeline string, local bool, lopt *LimitParams) (
 	case strings.HasPrefix(timeline, ":"), strings.HasPrefix(timeline, "#"):
 		hashtag := timeline[1:]
 		if hashtag == "" {
-			return nil, fmt.Errorf("timelines API: empty hashtag")
+			return nil, errors.New("timelines API: empty hashtag")
 		}
 		endPoint = "timelines/tag/" + hashtag
 	default:
-		return nil, fmt.Errorf("GetTimelines: bad timelines argument")
+		return nil, errors.New("GetTimelines: bad timelines argument")
 	}
 
 	params := make(apiCallParams)

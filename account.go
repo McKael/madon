@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/sendgrid/rest"
 )
 
@@ -390,7 +391,7 @@ func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string) 
 	// Prepare the request
 	req, err := mc.prepareRequest(endPoint, rest.Patch, params)
 	if err != nil {
-		return nil, fmt.Errorf("prepareRequest failed: %s", err.Error())
+		return nil, errors.Wrap(err, "prepareRequest failed")
 	}
 	req.Headers["Content-Type"] = w.FormDataContentType()
 	req.Body = formBuf.Bytes()
@@ -398,7 +399,7 @@ func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string) 
 	// Make API call
 	r, err := restAPI(req)
 	if err != nil {
-		return nil, fmt.Errorf("account update failed: %s", err.Error())
+		return nil, errors.Wrap(err, "account update failed")
 	}
 
 	// Check for error reply
@@ -406,14 +407,14 @@ func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string) 
 	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
 		// The empty object is not an error
 		if errorResult.Text != "" {
-			return nil, fmt.Errorf("%s", errorResult.Text)
+			return nil, errors.New(errorResult.Text)
 		}
 	}
 
 	// Not an error reply; let's unmarshal the data
 	var account Account
 	if err := json.Unmarshal([]byte(r.Body), &account); err != nil {
-		return nil, fmt.Errorf("cannot decode API response: %s", err.Error())
+		return nil, errors.Wrap(err, "cannot decode API response")
 	}
 	return &account, nil
 }

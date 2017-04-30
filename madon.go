@@ -8,7 +8,7 @@ Licensed under the MIT license.  Please see the LICENSE file is this directory.
 package madon
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 )
 
 // LimitParams contains common limit/paging options for the Mastodon REST API

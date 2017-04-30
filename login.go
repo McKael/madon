@@ -8,9 +8,9 @@ package madon
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/sendgrid/rest"
 )
 
@@ -29,10 +29,10 @@ func (mc *Client) LoginBasic(username, password string, scopes []string) error {
 	}
 
 	if username == "" {
-		return fmt.Errorf("missing username")
+		return errors.New("missing username")
 	}
 	if password == "" {
-		return fmt.Errorf("missing password")
+		return errors.New("missing password")
 	}
 
 	hdrs := make(map[string]string)
@@ -65,7 +65,7 @@ func (mc *Client) LoginBasic(username, password string, scopes []string) error {
 
 	err = json.Unmarshal([]byte(r.Body), &resp)
 	if err != nil {
-		return fmt.Errorf("cannot unmarshal server response: %s", err.Error())
+		return errors.Wrap(err, "cannot unmarshal server response")
 	}
 
 	mc.UserToken = &resp

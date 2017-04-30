@@ -9,12 +9,12 @@ package madon
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
 
+	"github.com/pkg/errors"
 	"github.com/sendgrid/rest"
 )
 
@@ -28,24 +28,24 @@ func (mc *Client) UploadMedia(filePath string) (*Attachment, error) {
 
 	f, err := os.Open(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("cannot read file: %s", err.Error())
+		return nil, errors.Wrap(err, "cannot read file")
 	}
 	defer f.Close()
 
 	w := multipart.NewWriter(&b)
 	formWriter, err := w.CreateFormFile("file", filepath.Base(filePath))
 	if err != nil {
-		return nil, fmt.Errorf("media upload: cannot create form: %s", err.Error())
+		return nil, errors.Wrap(err, "media upload")
 	}
 	if _, err = io.Copy(formWriter, f); err != nil {
-		return nil, fmt.Errorf("media upload: cannot create form: %s", err.Error())
+		return nil, errors.Wrap(err, "media upload")
 	}
 
 	w.Close()
 
 	req, err := mc.prepareRequest("media", rest.Post, nil)
 	if err != nil {
-		return nil, fmt.Errorf("media prepareRequest failed: %s", err.Error())
+		return nil, errors.Wrap(err, "media prepareRequest failed")
 	}
 	req.Headers["Content-Type"] = w.FormDataContentType()
 	req.Body = b.Bytes()
@@ -53,7 +53,7 @@ func (mc *Client) UploadMedia(filePath string) (*Attachment, error) {
 	// Make API call
 	r, err := restAPI(req)
 	if err != nil {
-		return nil, fmt.Errorf("media upload failed: %s", err.Error())
+		return nil, errors.Wrap(err, "media upload failed")
 	}
 
 	// Check for error reply
@@ -61,7 +61,7 @@ func (mc *Client) UploadMedia(filePath string) (*Attachment, error) {
 	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
 		// The empty object is not an error
 		if errorResult.Text != "" {
-			return nil, fmt.Errorf("%s", errorResult.Text)
+			return nil, errors.New(errorResult.Text)
 		}
 	}
 
@@ -69,7 +69,7 @@ func (mc *Client) UploadMedia(filePath string) (*Attachment, error) {
 	var attachment Attachment
 	err = json.Unmarshal([]byte(r.Body), &attachment)
 	if err != nil {
-		return nil, fmt.Errorf("cannot decode API response (media): %s", err.Error())
+		return nil, errors.Wrap(err, "cannot decode API response (media)")
 	}
 	return &attachment, nil
 }

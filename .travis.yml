@@ -11,7 +11,7 @@ branches:
   only:
   - master
 install:
-- go get github.com/urfave/cli
+- go get github.com/pkg/errors
 - go get github.com/stretchr/testify/assert
 - go get github.com/sendgrid/rest
 - go get github.com/gorilla/websocket

@@ -8,12 +8,11 @@ package madon
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net/url"
 	"strings"
 
 	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
 )
 
 // StreamEvent contains a single event from the streaming API
@@ -49,7 +48,7 @@ func (mc *Client) openStream(streamName, hashTag string) (*websocket.Conn, error
 	// Build streaming websocket URL
 	u, err := url.Parse("ws" + mc.APIBase[4:] + "/streaming/")
 	if err != nil {
-		return nil, errors.New("cannot create Websocket URL: " + err.Error())
+		return nil, errors.Wrap(err, "cannot create Websocket URL")
 	}
 
 	urlParams := url.Values{}
@@ -92,7 +91,7 @@ func (mc *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, done
 			if strings.Contains(err.Error(), "close 1000 (normal)") {
 				break // Connection properly closed
 			}
-			e := fmt.Errorf("read error: %v", err)
+			e := errors.Wrap(err, "read error")
 			events <- StreamEvent{Event: "error", Error: e}
 			break
 		}
@@ -104,13 +103,13 @@ func (mc *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, done
 		case "update":
 			strPayload, ok := msg.Payload.(string)
 			if !ok {
-				e := fmt.Errorf("could not decode status: payload isn't a string")
+				e := errors.New("could not decode status: payload isn't a string")
 				events <- StreamEvent{Event: "error", Error: e}
 				continue
 			}
 			var s Status
 			if err := json.Unmarshal([]byte(strPayload), &s); err != nil {
-				e := fmt.Errorf("could not decode status: %v", err)
+				e := errors.Wrap(err, "could not decode status")
 				events <- StreamEvent{Event: "error", Error: e}
 				continue
 			}
@@ -118,13 +117,13 @@ func (mc *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, done
 		case "notification":
 			strPayload, ok := msg.Payload.(string)
 			if !ok {
-				e := fmt.Errorf("could not decode notification: payload isn't a string")
+				e := errors.New("could not decode notification: payload isn't a string")
 				events <- StreamEvent{Event: "error", Error: e}
 				continue
 			}
 			var notif Notification
 			if err := json.Unmarshal([]byte(strPayload), &notif); err != nil {
-				e := fmt.Errorf("could not decode notification: %v", err)
+				e := errors.Wrap(err, "could not decode notification")
 				events <- StreamEvent{Event: "error", Error: e}
 				continue
 			}
@@ -132,13 +131,13 @@ func (mc *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, done
 		case "delete":
 			floatPayload, ok := msg.Payload.(float64)
 			if !ok {
-				e := fmt.Errorf("could not decode deletion: payload isn't a number")
+				e := errors.New("could not decode deletion: payload isn't a number")
 				events <- StreamEvent{Event: "error", Error: e}
 				continue
 			}
 			obj = int64(floatPayload) // statusID
 		default:
-			e := fmt.Errorf("unhandled event '%s'", msg.Event)
+			e := errors.Errorf("unhandled event '%s'", msg.Event)
 			events <- StreamEvent{Event: "error", Error: e}
 			continue
 		}

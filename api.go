@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/sendgrid/rest"
 )
 
@@ -167,7 +168,7 @@ func (mc *Client) prepareRequest(target string, method rest.Method, params apiCa
 // will be set (if they exist) in the structure.
 func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallParams, limitOptions *LimitParams, links *apiLinks, data interface{}) error {
 	if mc == nil {
-		return fmt.Errorf("use of uninitialized madon client")
+		return errors.New("use of uninitialized madon client")
 	}
 
 	if limitOptions != nil {
@@ -194,13 +195,13 @@ func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallPar
 	// Make API call
 	r, err := restAPI(req)
 	if err != nil {
-		return fmt.Errorf("API query (%s) failed: %s", endPoint, err.Error())
+		return errors.Wrapf(err, "API query (%s) failed", endPoint)
 	}
 
 	if links != nil {
 		pLinks, err := parseLink(r.Headers["Link"])
 		if err != nil {
-			return fmt.Errorf("cannot decode header links (%s): %s", method, err.Error())
+			return errors.Wrapf(err, "cannot decode header links (%s)", method)
 		}
 		if pLinks != nil {
 			*links = *pLinks
@@ -212,14 +213,14 @@ func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallPar
 	if err := json.Unmarshal([]byte(r.Body), &errorResult); err == nil {
 		// The empty object is not an error
 		if errorResult.Text != "" {
-			return fmt.Errorf("%s", errorResult.Text)
+			return errors.New(errorResult.Text)
 		}
 	}
 
 	// Not an error reply; let's unmarshal the data
 	err = json.Unmarshal([]byte(r.Body), &data)
 	if err != nil {
-		return fmt.Errorf("cannot decode API response (%s): %s", method, err.Error())
+		return errors.Wrapf(err, "cannot decode API response (%s)", method)
 	}
 	return nil
 }

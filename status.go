@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/pkg/errors"
 	"github.com/sendgrid/rest"
 )
 
@@ -97,7 +98,7 @@ func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data int
 			return ErrInvalidParameter
 		}
 		if len(opts.MediaIDs) > 4 {
-			return fmt.Errorf("too many (>4) media IDs")
+			return errors.New("too many (>4) media IDs")
 		}
 	case "delete":
 		method = rest.Delete

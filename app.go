@@ -8,10 +8,10 @@ Licensed under the MIT license.  Please see the LICENSE file is this directory.
 package madon
 
 import (
-	"errors"
 	"net/url"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/sendgrid/rest"
 )
 
