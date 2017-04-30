@@ -16,12 +16,12 @@ import (
 // updateStatusOptions contains option fields for POST and DELETE API calls
 type updateStatusOptions struct {
 	// The ID is used for most commands
-	ID int
+	ID int64
 
 	// The following fields are used for posting a new status
 	Status      string
-	InReplyToID int
-	MediaIDs    []int
+	InReplyToID int64
+	MediaIDs    []int64
 	Sensitive   bool
 	SpoilerText string
 	Visibility  string // "direct", "private", "unlisted" or "public"
@@ -31,12 +31,12 @@ type updateStatusOptions struct {
 // The operation 'op' can be empty or "status" (the status itself), "context",
 // "card", "reblogged_by", "favourited_by".
 // The data argument will receive the object(s) returned by the API server.
-func (mc *Client) queryStatusData(statusID int, op string, data interface{}) error {
+func (mc *Client) queryStatusData(statusID int64, op string, data interface{}) error {
 	if statusID < 1 {
 		return ErrInvalidID
 	}
 
-	endPoint := "statuses/" + strconv.Itoa(statusID)
+	endPoint := "statuses/" + strconv.FormatInt(statusID, 10)
 
 	if op != "" && op != "status" {
 		switch op {
@@ -80,12 +80,12 @@ func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data int
 		if opts.ID < 1 {
 			return ErrInvalidID
 		}
-		endPoint += "/" + strconv.Itoa(opts.ID)
+		endPoint += "/" + strconv.FormatInt(opts.ID, 10)
 	case "reblog", "unreblog", "favourite", "unfavourite":
 		if opts.ID < 1 {
 			return ErrInvalidID
 		}
-		endPoint += "/" + strconv.Itoa(opts.ID) + "/" + op
+		endPoint += "/" + strconv.FormatInt(opts.ID, 10) + "/" + op
 	default:
 		return ErrInvalidParameter
 	}
@@ -94,14 +94,14 @@ func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data int
 	if op == "status" {
 		params["status"] = opts.Status
 		if opts.InReplyToID > 0 {
-			params["in_reply_to_id"] = strconv.Itoa(opts.InReplyToID)
+			params["in_reply_to_id"] = strconv.FormatInt(opts.InReplyToID, 10)
 		}
 		for i, id := range opts.MediaIDs {
 			if id < 1 {
 				return ErrInvalidID
 			}
 			qID := fmt.Sprintf("media_ids[%d]", i+1)
-			params[qID] = strconv.Itoa(id)
+			params[qID] = strconv.FormatInt(id, 10)
 		}
 		if opts.Sensitive {
 			params["sensitive"] = "true"
@@ -120,7 +120,7 @@ func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data int
 // GetStatus returns a status
 // The returned status can be nil if there is an error or if the
 // requested ID does not exist.
-func (mc *Client) GetStatus(statusID int) (*Status, error) {
+func (mc *Client) GetStatus(statusID int64) (*Status, error) {
 	var status Status
 
 	if err := mc.queryStatusData(statusID, "status", &status); err != nil {
@@ -133,7 +133,7 @@ func (mc *Client) GetStatus(statusID int) (*Status, error) {
 }
 
 // GetStatusContext returns a status context
-func (mc *Client) GetStatusContext(statusID int) (*Context, error) {
+func (mc *Client) GetStatusContext(statusID int64) (*Context, error) {
 	var context Context
 	if err := mc.queryStatusData(statusID, "context", &context); err != nil {
 		return nil, err
@@ -142,7 +142,7 @@ func (mc *Client) GetStatusContext(statusID int) (*Context, error) {
 }
 
 // GetStatusCard returns a status card
-func (mc *Client) GetStatusCard(statusID int) (*Card, error) {
+func (mc *Client) GetStatusCard(statusID int64) (*Card, error) {
 	var card Card
 	if err := mc.queryStatusData(statusID, "card", &card); err != nil {
 		return nil, err
@@ -151,13 +151,13 @@ func (mc *Client) GetStatusCard(statusID int) (*Card, error) {
 }
 
 // GetStatusRebloggedBy returns a list of the accounts who reblogged a status
-func (mc *Client) GetStatusRebloggedBy(statusID int, lopt *LimitParams) ([]Account, error) {
+func (mc *Client) GetStatusRebloggedBy(statusID int64, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: statusID, Limit: lopt}
 	return mc.getMultipleAccounts("reblogged_by", o)
 }
 
 // GetStatusFavouritedBy returns a list of the accounts who favourited a status
-func (mc *Client) GetStatusFavouritedBy(statusID int, lopt *LimitParams) ([]Account, error) {
+func (mc *Client) GetStatusFavouritedBy(statusID int64, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: statusID, Limit: lopt}
 	return mc.getMultipleAccounts("favourited_by", o)
 }
@@ -165,7 +165,7 @@ func (mc *Client) GetStatusFavouritedBy(statusID int, lopt *LimitParams) ([]Acco
 // PostStatus posts a new "toot"
 // All parameters but "text" can be empty.
 // Visibility must be empty, or one of "direct", "private", "unlisted" and "public".
-func (mc *Client) PostStatus(text string, inReplyTo int, mediaIDs []int, sensitive bool, spoilerText string, visibility string) (*Status, error) {
+func (mc *Client) PostStatus(text string, inReplyTo int64, mediaIDs []int64, sensitive bool, spoilerText string, visibility string) (*Status, error) {
 	var status Status
 	o := updateStatusOptions{
 		Status:      text,
@@ -187,7 +187,7 @@ func (mc *Client) PostStatus(text string, inReplyTo int, mediaIDs []int, sensiti
 }
 
 // DeleteStatus deletes a status
-func (mc *Client) DeleteStatus(statusID int) error {
+func (mc *Client) DeleteStatus(statusID int64) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
 	err := mc.updateStatusData("delete", o, &status)
@@ -195,7 +195,7 @@ func (mc *Client) DeleteStatus(statusID int) error {
 }
 
 // ReblogStatus reblogs a status
-func (mc *Client) ReblogStatus(statusID int) error {
+func (mc *Client) ReblogStatus(statusID int64) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
 	err := mc.updateStatusData("reblog", o, &status)
@@ -203,7 +203,7 @@ func (mc *Client) ReblogStatus(statusID int) error {
 }
 
 // UnreblogStatus unreblogs a status
-func (mc *Client) UnreblogStatus(statusID int) error {
+func (mc *Client) UnreblogStatus(statusID int64) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
 	err := mc.updateStatusData("unreblog", o, &status)
@@ -211,7 +211,7 @@ func (mc *Client) UnreblogStatus(statusID int) error {
 }
 
 // FavouriteStatus favourites a status
-func (mc *Client) FavouriteStatus(statusID int) error {
+func (mc *Client) FavouriteStatus(statusID int64) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
 	err := mc.updateStatusData("favourite", o, &status)
@@ -219,7 +219,7 @@ func (mc *Client) FavouriteStatus(statusID int) error {
 }
 
 // UnfavouriteStatus unfavourites a status
-func (mc *Client) UnfavouriteStatus(statusID int) error {
+func (mc *Client) UnfavouriteStatus(statusID int64) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
 	err := mc.updateStatusData("unfavourite", o, &status)

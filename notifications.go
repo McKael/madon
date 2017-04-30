@@ -41,12 +41,12 @@ func (mc *Client) GetNotifications(lopt *LimitParams) ([]Notification, error) {
 // GetNotification returns a notification
 // The returned notification can be nil if there is an error or if the
 // requested notification does not exist.
-func (mc *Client) GetNotification(notificationID int) (*Notification, error) {
+func (mc *Client) GetNotification(notificationID int64) (*Notification, error) {
 	if notificationID < 1 {
 		return nil, ErrInvalidID
 	}
 
-	var endPoint = "notifications/" + strconv.Itoa(notificationID)
+	var endPoint = "notifications/" + strconv.FormatInt(notificationID, 10)
 	var notification Notification
 	if err := mc.apiCall(endPoint, rest.Get, nil, nil, nil, &notification); err != nil {
 		return nil, err
@@ -58,13 +58,13 @@ func (mc *Client) GetNotification(notificationID int) (*Notification, error) {
 }
 
 // DismissNotification deletes a notification
-func (mc *Client) DismissNotification(notificationID int) error {
+func (mc *Client) DismissNotification(notificationID int64) error {
 	if notificationID < 1 {
 		return ErrInvalidID
 	}
 
 	endPoint := "notifications/dismiss"
-	params := apiCallParams{"id": strconv.Itoa(notificationID)}
+	params := apiCallParams{"id": strconv.FormatInt(notificationID, 10)}
 	err := mc.apiCall(endPoint, rest.Post, params, nil, nil, &Notification{})
 	return err
 }

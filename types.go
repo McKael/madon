@@ -28,7 +28,7 @@ Entities - Everything manipulated/returned by the API
 
 // Account represents a Mastodon account entity
 type Account struct {
-	ID             int       `json:"id"`
+	ID             int64     `json:"id"`
 	Username       string    `json:"username"`
 	Acct           string    `json:"acct"`
 	DisplayName    string    `json:"display_name"`
@@ -38,9 +38,9 @@ type Account struct {
 	Header         string    `json:"header"`
 	Locked         bool      `json:"locked"`
 	CreatedAt      time.Time `json:"created_at"`
-	FollowersCount int       `json:"followers_count"`
-	FollowingCount int       `json:"following_count"`
-	StatusesCount  int       `json:"statuses_count"`
+	FollowersCount int64     `json:"followers_count"`
+	FollowingCount int64     `json:"following_count"`
+	StatusesCount  int64     `json:"statuses_count"`
 }
 
 // Application represents a Mastodon application entity
@@ -51,7 +51,7 @@ type Application struct {
 
 // Attachment represents a Mastodon attachement entity
 type Attachment struct {
-	ID         int    `json:"iD"`
+	ID         int64  `json:"iD"`
 	Type       string `json:"type"`
 	URL        string `json:"url"`
 	RemoteURL  string `json:"remote_url"`
@@ -89,7 +89,7 @@ type Instance struct {
 
 // Mention represents a Mastodon mention entity
 type Mention struct {
-	ID       int    `json:"id"`
+	ID       int64  `json:"id"`
 	URL      string `json:"url"`
 	Username string `json:"username"`
 	Acct     string `json:"acct"`
@@ -97,7 +97,7 @@ type Mention struct {
 
 // Notification represents a Mastodon notification entity
 type Notification struct {
-	ID        int       `json:"id"`
+	ID        int64     `json:"id"`
 	Type      string    `json:"type"`
 	CreatedAt time.Time `json:"created_at"`
 	Account   *Account  `json:"account"`
@@ -106,17 +106,17 @@ type Notification struct {
 
 // Relationship represents a Mastodon relationship entity
 type Relationship struct {
-	ID         int  `json:"id"`
-	Following  bool `json:"following"`
-	FollowedBy bool `json:"followed_by"`
-	Blocking   bool `json:"blocking"`
-	Muting     bool `json:"muting"`
-	Requested  bool `json:"requested"`
+	ID         int64 `json:"id"`
+	Following  bool  `json:"following"`
+	FollowedBy bool  `json:"followed_by"`
+	Blocking   bool  `json:"blocking"`
+	Muting     bool  `json:"muting"`
+	Requested  bool  `json:"requested"`
 }
 
 // Report represents a Mastodon report entity
 type Report struct {
-	ID          int    `json:"iD"`
+	ID          int64  `json:"iD"`
 	ActionTaken string `json:"action_taken"`
 }
 
@@ -129,17 +129,17 @@ type Results struct {
 
 // Status represents a Mastodon status entity
 type Status struct {
-	ID                 int          `json:"id"`
+	ID                 int64        `json:"id"`
 	URI                string       `json:"uri"`
 	URL                string       `json:"url"`
 	Account            *Account     `json:"account"`
-	InReplyToID        int          `json:"in_reply_to_id"`
-	InReplyToAccountID int          `json:"in_reply_to_account_id"`
+	InReplyToID        int64        `json:"in_reply_to_id"`
+	InReplyToAccountID int64        `json:"in_reply_to_account_id"`
 	Reblog             *Status      `json:"reblog"`
 	Content            string       `json:"content"`
 	CreatedAt          time.Time    `json:"created_at"`
-	ReblogsCount       int          `json:"reblogs_count"`
-	FavouritesCount    int          `json:"favourites_count"`
+	ReblogsCount       int64        `json:"reblogs_count"`
+	FavouritesCount    int64        `json:"favourites_count"`
 	Reblogged          bool         `json:"reblogged"`
 	Favourited         bool         `json:"favourited"`
 	Sensitive          bool         `json:"sensitive"`

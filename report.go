@@ -24,20 +24,20 @@ func (mc *Client) GetReports(lopt *LimitParams) ([]Report, error) {
 }
 
 // ReportUser reports the user account
-func (mc *Client) ReportUser(accountID int, statusIDs []int, comment string) (*Report, error) {
+func (mc *Client) ReportUser(accountID int64, statusIDs []int64, comment string) (*Report, error) {
 	if accountID < 1 || comment == "" || len(statusIDs) < 1 {
 		return nil, ErrInvalidParameter
 	}
 
 	params := make(apiCallParams)
-	params["account_id"] = strconv.Itoa(accountID)
+	params["account_id"] = strconv.FormatInt(accountID, 10)
 	params["comment"] = comment
 	for i, id := range statusIDs {
 		if id < 1 {
 			return nil, ErrInvalidID
 		}
 		qID := fmt.Sprintf("status_ids[%d]", i+1)
-		params[qID] = strconv.Itoa(id)
+		params[qID] = strconv.FormatInt(id, 10)
 	}
 
 	var report Report

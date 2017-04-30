@@ -136,7 +136,7 @@ func (mc *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, done
 				events <- StreamEvent{Event: "error", Error: e}
 				continue
 			}
-			obj = int(floatPayload) // statusID
+			obj = int64(floatPayload) // statusID
 		default:
 			e := fmt.Errorf("unhandled event '%s'", msg.Event)
 			events <- StreamEvent{Event: "error", Error: e}

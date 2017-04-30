@@ -16,7 +16,7 @@ import (
 )
 
 type registerApp struct {
-	ID           int    `json:"id"`
+	ID           int64  `json:"id"`
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 }

@@ -23,7 +23,7 @@ import (
 // getAccountsOptions contains option fields for POST and DELETE API calls
 type getAccountsOptions struct {
 	// The ID is used for most commands
-	ID int
+	ID int64
 
 	// The Q field (query) is used when searching for accounts
 	Q string
@@ -36,10 +36,10 @@ type getAccountsOptions struct {
 // "unfollow", "block", "unblock", "mute", "unmute",
 // "follow_requests/authorize" or // "follow_requests/reject".
 // The id is optional and depends on the operation.
-func (mc *Client) getSingleAccount(op string, id int) (*Account, error) {
+func (mc *Client) getSingleAccount(op string, id int64) (*Account, error) {
 	var endPoint string
 	method := rest.Get
-	strID := strconv.Itoa(id)
+	strID := strconv.FormatInt(id, 10)
 
 	switch op {
 	case "account":
@@ -84,7 +84,7 @@ func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Ac
 		if opts == nil || opts.ID < 1 {
 			return []Account{}, ErrInvalidID
 		}
-		endPoint = "accounts/" + strconv.Itoa(opts.ID) + "/" + op
+		endPoint = "accounts/" + strconv.FormatInt(opts.ID, 10) + "/" + op
 	case "follow_requests", "blocks", "mutes":
 		endPoint = op
 	case "search":
@@ -96,7 +96,7 @@ func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Ac
 		if opts == nil || opts.ID < 1 {
 			return []Account{}, ErrInvalidID
 		}
-		endPoint = "statuses/" + strconv.Itoa(opts.ID) + "/" + op
+		endPoint = "statuses/" + strconv.FormatInt(opts.ID, 10) + "/" + op
 	default:
 		return nil, ErrInvalidParameter
 	}
@@ -130,7 +130,7 @@ func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Ac
 // GetAccount returns an account entity
 // The returned value can be nil if there is an error or if the
 // requested ID does not exist.
-func (mc *Client) GetAccount(accountID int) (*Account, error) {
+func (mc *Client) GetAccount(accountID int64) (*Account, error) {
 	account, err := mc.getSingleAccount("account", accountID)
 	if err != nil {
 		return nil, err
@@ -154,19 +154,19 @@ func (mc *Client) GetCurrentAccount() (*Account, error) {
 }
 
 // GetAccountFollowers returns the list of accounts following a given account
-func (mc *Client) GetAccountFollowers(accountID int, lopt *LimitParams) ([]Account, error) {
+func (mc *Client) GetAccountFollowers(accountID int64, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: accountID, Limit: lopt}
 	return mc.getMultipleAccounts("followers", o)
 }
 
 // GetAccountFollowing returns the list of accounts a given account is following
-func (mc *Client) GetAccountFollowing(accountID int, lopt *LimitParams) ([]Account, error) {
+func (mc *Client) GetAccountFollowing(accountID int64, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: accountID, Limit: lopt}
 	return mc.getMultipleAccounts("following", o)
 }
 
 // FollowAccount follows an account
-func (mc *Client) FollowAccount(accountID int) error {
+func (mc *Client) FollowAccount(accountID int64) error {
 	account, err := mc.getSingleAccount("follow", accountID)
 	if err != nil {
 		return err
@@ -178,7 +178,7 @@ func (mc *Client) FollowAccount(accountID int) error {
 }
 
 // UnfollowAccount unfollows an account
-func (mc *Client) UnfollowAccount(accountID int) error {
+func (mc *Client) UnfollowAccount(accountID int64) error {
 	account, err := mc.getSingleAccount("unfollow", accountID)
 	if err != nil {
 		return err
@@ -210,7 +210,7 @@ func (mc *Client) FollowRemoteAccount(uri string) (*Account, error) {
 }
 
 // BlockAccount blocks an account
-func (mc *Client) BlockAccount(accountID int) error {
+func (mc *Client) BlockAccount(accountID int64) error {
 	account, err := mc.getSingleAccount("block", accountID)
 	if err != nil {
 		return err
@@ -222,7 +222,7 @@ func (mc *Client) BlockAccount(accountID int) error {
 }
 
 // UnblockAccount unblocks an account
-func (mc *Client) UnblockAccount(accountID int) error {
+func (mc *Client) UnblockAccount(accountID int64) error {
 	account, err := mc.getSingleAccount("unblock", accountID)
 	if err != nil {
 		return err
@@ -234,7 +234,7 @@ func (mc *Client) UnblockAccount(accountID int) error {
 }
 
 // MuteAccount mutes an account
-func (mc *Client) MuteAccount(accountID int) error {
+func (mc *Client) MuteAccount(accountID int64) error {
 	account, err := mc.getSingleAccount("mute", accountID)
 	if err != nil {
 		return err
@@ -246,7 +246,7 @@ func (mc *Client) MuteAccount(accountID int) error {
 }
 
 // UnmuteAccount unmutes an account
-func (mc *Client) UnmuteAccount(accountID int) error {
+func (mc *Client) UnmuteAccount(accountID int64) error {
 	account, err := mc.getSingleAccount("unmute", accountID)
 	if err != nil {
 		return err
@@ -286,7 +286,7 @@ func (mc *Client) GetAccountFollowRequests(lopt *LimitParams) ([]Account, error)
 }
 
 // GetAccountRelationships returns a list of relationship entities for the given accounts
-func (mc *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, error) {
+func (mc *Client) GetAccountRelationships(accountIDs []int64) ([]Relationship, error) {
 	if len(accountIDs) < 1 {
 		return nil, ErrInvalidID
 	}
@@ -297,7 +297,7 @@ func (mc *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, err
 			return nil, ErrInvalidID
 		}
 		qID := fmt.Sprintf("id[%d]", i+1)
-		params[qID] = strconv.Itoa(id)
+		params[qID] = strconv.FormatInt(id, 10)
 	}
 
 	var rl []Relationship
@@ -314,12 +314,12 @@ func (mc *Client) GetAccountRelationships(accountIDs []int) ([]Relationship, err
 // has nothing to return.
 // If lopt.Limit is set (and not All), several queries can be made until the
 // limit is reached.
-func (mc *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bool, lopt *LimitParams) ([]Status, error) {
+func (mc *Client) GetAccountStatuses(accountID int64, onlyMedia, excludeReplies bool, lopt *LimitParams) ([]Status, error) {
 	if accountID < 1 {
 		return nil, ErrInvalidID
 	}
 
-	endPoint := "accounts/" + strconv.Itoa(accountID) + "/" + "statuses"
+	endPoint := "accounts/" + strconv.FormatInt(accountID, 10) + "/" + "statuses"
 	params := make(apiCallParams)
 	if onlyMedia {
 		params["only_media"] = "true"
@@ -349,7 +349,7 @@ func (mc *Client) GetAccountStatuses(accountID int, onlyMedia, excludeReplies bo
 }
 
 // FollowRequestAuthorize authorizes or rejects an account follow-request
-func (mc *Client) FollowRequestAuthorize(accountID int, authorize bool) error {
+func (mc *Client) FollowRequestAuthorize(accountID int64, authorize bool) error {
 	endPoint := "follow_requests/reject"
 	if authorize {
 		endPoint = "follow_requests/authorize"

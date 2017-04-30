@@ -17,7 +17,7 @@ import (
 // UserToken represents a user token as returned by the Mastodon API
 type UserToken struct {
 	AccessToken string `json:"access_token"`
-	CreatedAt   int    `json:"created_at"`
+	CreatedAt   int64  `json:"created_at"`
 	Scope       string `json:"scope"`
 	TokenType   string `json:"token_type"`
 }
