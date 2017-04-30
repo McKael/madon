@@ -27,6 +27,30 @@ type updateStatusOptions struct {
 	Visibility  string // "direct", "private", "unlisted" or "public"
 }
 
+// getMultipleStatuses returns a list of status entities
+// If opts.All is true, several requests will be made until the API server
+// has nothing to return.
+func (mc *Client) getMultipleStatuses(endPoint string, params apiCallParams, lopt *LimitParams) ([]Status, error) {
+	var statuses []Status
+	var links apiLinks
+	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &links, &statuses); err != nil {
+		return nil, err
+	}
+	if lopt != nil { // Fetch more pages to reach our limit
+		var statusSlice []Status
+		for (lopt.All || lopt.Limit > len(statuses)) && links.next != nil {
+			newlopt := links.next
+			links = apiLinks{}
+			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &statusSlice); err != nil {
+				return nil, err
+			}
+			statuses = append(statuses, statusSlice...)
+			statusSlice = statusSlice[:0] // Clear struct
+		}
+	}
+	return statuses, nil
+}
+
 // queryStatusData queries the statuses API
 // The operation 'op' can be empty or "status" (the status itself), "context",
 // "card", "reblogged_by", "favourited_by".

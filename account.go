@@ -328,24 +328,7 @@ func (mc *Client) GetAccountStatuses(accountID int64, onlyMedia, excludeReplies 
 		params["exclude_replies"] = "true"
 	}
 
-	var sl []Status
-	var links apiLinks
-	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &links, &sl); err != nil {
-		return nil, err
-	}
-	if lopt != nil { // Fetch more pages to reach our limit
-		var statusSlice []Status
-		for (lopt.All || lopt.Limit > len(sl)) && links.next != nil {
-			newlopt := links.next
-			links = apiLinks{}
-			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &statusSlice); err != nil {
-				return nil, err
-			}
-			sl = append(sl, statusSlice...)
-			statusSlice = statusSlice[:0] // Clear struct
-		}
-	}
-	return sl, nil
+	return mc.getMultipleStatuses(endPoint, params, lopt)
 }
 
 // FollowRequestAuthorize authorizes or rejects an account follow-request

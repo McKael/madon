@@ -9,8 +9,6 @@ package madon
 import (
 	"fmt"
 	"strings"
-
-	"github.com/sendgrid/rest"
 )
 
 // GetTimelines returns a timeline (a list of statuses
@@ -42,22 +40,5 @@ func (mc *Client) GetTimelines(timeline string, local bool, lopt *LimitParams) (
 		params["local"] = "true"
 	}
 
-	var tl []Status
-	var links apiLinks
-	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &links, &tl); err != nil {
-		return nil, err
-	}
-	if lopt != nil { // Fetch more pages to reach our limit
-		var statusSlice []Status
-		for (lopt.All || lopt.Limit > len(tl)) && links.next != nil {
-			newlopt := links.next
-			links = apiLinks{}
-			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &statusSlice); err != nil {
-				return nil, err
-			}
-			tl = append(tl, statusSlice...)
-			statusSlice = statusSlice[:0] // Clear struct
-		}
-	}
-	return tl, nil
+	return mc.getMultipleStatuses(endPoint, params, lopt)
 }
