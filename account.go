@@ -66,12 +66,36 @@ func (mc *Client) getSingleAccount(op string, id int64) (*Account, error) {
 }
 
 // getMultipleAccounts returns a list of account entities
+// If lopt.All is true, several requests will be made until the API server
+// has nothing to return.
+func (mc *Client) getMultipleAccounts(endPoint string, params apiCallParams, lopt *LimitParams) ([]Account, error) {
+	var accounts []Account
+	var links apiLinks
+	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &links, &accounts); err != nil {
+		return nil, err
+	}
+	if lopt != nil { // Fetch more pages to reach our limit
+		var accountSlice []Account
+		for (lopt.All || lopt.Limit > len(accounts)) && links.next != nil {
+			newlopt := links.next
+			links = apiLinks{}
+			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &accountSlice); err != nil {
+				return nil, err
+			}
+			accounts = append(accounts, accountSlice...)
+			accountSlice = accountSlice[:0] // Clear struct
+		}
+	}
+	return accounts, nil
+}
+
+// getMultipleAccountsHelper returns a list of account entities
 // The operation 'op' can be "followers", "following", "search", "blocks",
 // "mutes", "follow_requests".
 // The id is optional and depends on the operation.
 // If opts.All is true, several requests will be made until the API server
 // has nothing to return.
-func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Account, error) {
+func (mc *Client) getMultipleAccountsHelper(op string, opts *getAccountsOptions) ([]Account, error) {
 	var endPoint string
 	var lopt *LimitParams
 
@@ -107,24 +131,7 @@ func (mc *Client) getMultipleAccounts(op string, opts *getAccountsOptions) ([]Ac
 		params["q"] = opts.Q
 	}
 
-	var accounts []Account
-	var links apiLinks
-	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &links, &accounts); err != nil {
-		return nil, err
-	}
-	if lopt != nil { // Fetch more pages to reach our limit
-		var accountSlice []Account
-		for (lopt.All || lopt.Limit > len(accounts)) && links.next != nil {
-			newlopt := links.next
-			links = apiLinks{}
-			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &accountSlice); err != nil {
-				return nil, err
-			}
-			accounts = append(accounts, accountSlice...)
-			accountSlice = accountSlice[:0] // Clear struct
-		}
-	}
-	return accounts, nil
+	return mc.getMultipleAccounts(endPoint, params, lopt)
 }
 
 // GetAccount returns an account entity
@@ -156,13 +163,13 @@ func (mc *Client) GetCurrentAccount() (*Account, error) {
 // GetAccountFollowers returns the list of accounts following a given account
 func (mc *Client) GetAccountFollowers(accountID int64, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: accountID, Limit: lopt}
-	return mc.getMultipleAccounts("followers", o)
+	return mc.getMultipleAccountsHelper("followers", o)
 }
 
 // GetAccountFollowing returns the list of accounts a given account is following
 func (mc *Client) GetAccountFollowing(accountID int64, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: accountID, Limit: lopt}
-	return mc.getMultipleAccounts("following", o)
+	return mc.getMultipleAccountsHelper("following", o)
 }
 
 // FollowAccount follows an account
@@ -261,28 +268,28 @@ func (mc *Client) UnmuteAccount(accountID int64) error {
 // The lopt parameter is optional (can be nil) or can be used to set a limit.
 func (mc *Client) SearchAccounts(query string, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{Q: query, Limit: lopt}
-	return mc.getMultipleAccounts("search", o)
+	return mc.getMultipleAccountsHelper("search", o)
 }
 
 // GetBlockedAccounts returns the list of blocked accounts
 // The lopt parameter is optional (can be nil).
 func (mc *Client) GetBlockedAccounts(lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{Limit: lopt}
-	return mc.getMultipleAccounts("blocks", o)
+	return mc.getMultipleAccountsHelper("blocks", o)
 }
 
 // GetMutedAccounts returns the list of muted accounts
 // The lopt parameter is optional (can be nil).
 func (mc *Client) GetMutedAccounts(lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{Limit: lopt}
-	return mc.getMultipleAccounts("mutes", o)
+	return mc.getMultipleAccountsHelper("mutes", o)
 }
 
 // GetAccountFollowRequests returns the list of follow requests accounts
 // The lopt parameter is optional (can be nil).
 func (mc *Client) GetAccountFollowRequests(lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{Limit: lopt}
-	return mc.getMultipleAccounts("follow_requests", o)
+	return mc.getMultipleAccountsHelper("follow_requests", o)
 }
 
 // GetAccountRelationships returns a list of relationship entities for the given accounts

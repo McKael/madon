@@ -28,7 +28,7 @@ type updateStatusOptions struct {
 }
 
 // getMultipleStatuses returns a list of status entities
-// If opts.All is true, several requests will be made until the API server
+// If lopt.All is true, several requests will be made until the API server
 // has nothing to return.
 func (mc *Client) getMultipleStatuses(endPoint string, params apiCallParams, lopt *LimitParams) ([]Status, error) {
 	var statuses []Status
@@ -177,13 +177,13 @@ func (mc *Client) GetStatusCard(statusID int64) (*Card, error) {
 // GetStatusRebloggedBy returns a list of the accounts who reblogged a status
 func (mc *Client) GetStatusRebloggedBy(statusID int64, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: statusID, Limit: lopt}
-	return mc.getMultipleAccounts("reblogged_by", o)
+	return mc.getMultipleAccountsHelper("reblogged_by", o)
 }
 
 // GetStatusFavouritedBy returns a list of the accounts who favourited a status
 func (mc *Client) GetStatusFavouritedBy(statusID int64, lopt *LimitParams) ([]Account, error) {
 	o := &getAccountsOptions{ID: statusID, Limit: lopt}
-	return mc.getMultipleAccounts("favourited_by", o)
+	return mc.getMultipleAccountsHelper("favourited_by", o)
 }
 
 // PostStatus posts a new "toot"
