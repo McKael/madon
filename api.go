@@ -127,6 +127,10 @@ func restAPI(request rest.Request) (*rest.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		return nil, errors.Errorf("bad server status code (%d): %s",
+			res.StatusCode, http.StatusText(res.StatusCode))
+	}
 
 	// Build Response object.
 	response, err := rest.BuildResponse(res)
