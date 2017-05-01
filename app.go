@@ -46,7 +46,7 @@ func buildInstanceURL(instanceName string) (string, error) {
 }
 
 // NewApp registers a new application with a given instance
-func NewApp(name string, scopes []string, redirectURI, instanceName string) (mc *Client, err error) {
+func NewApp(name, website string, scopes []string, redirectURI, instanceName string) (mc *Client, err error) {
 	instanceURL, err := buildInstanceURL(instanceName)
 	if err != nil {
 		return nil, err
@@ -60,6 +60,9 @@ func NewApp(name string, scopes []string, redirectURI, instanceName string) (mc 
 
 	params := make(apiCallParams)
 	params["client_name"] = name
+	if website != "" {
+		params["website"] = website
+	}
 	params["scopes"] = strings.Join(scopes, " ")
 	if redirectURI != "" {
 		params["redirect_uris"] = redirectURI
