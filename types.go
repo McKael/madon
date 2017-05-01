@@ -51,7 +51,7 @@ type Application struct {
 
 // Attachment represents a Mastodon attachement entity
 type Attachment struct {
-	ID         int64  `json:"iD"`
+	ID         int64  `json:"id"`
 	Type       string `json:"type"`
 	URL        string `json:"url"`
 	RemoteURL  string `json:"remote_url"`
@@ -116,7 +116,7 @@ type Relationship struct {
 
 // Report represents a Mastodon report entity
 type Report struct {
-	ID          int64  `json:"iD"`
+	ID          int64  `json:"id"`
 	ActionTaken string `json:"action_taken"`
 }
 
