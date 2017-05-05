@@ -70,7 +70,7 @@ type Card struct {
 // Context represents a Mastodon context entity
 type Context struct {
 	Ancestors   []Status `json:"ancestors"`
-	Descendents []Status `json:"descendents"`
+	Descendants []Status `json:"descendants"`
 }
 
 // Error represents a Mastodon error entity
