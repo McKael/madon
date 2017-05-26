@@ -107,13 +107,12 @@ type Notification struct {
 
 // Relationship represents a Mastodon relationship entity
 type Relationship struct {
-	ID           int64 `json:"id"`
-	Following    bool  `json:"following"`
-	FollowedBy   bool  `json:"followed_by"`
-	Blocking     bool  `json:"blocking"`
-	Muting       bool  `json:"muting"`
-	MutingBoosts bool  `json:"muting_boosts"`
-	Requested    bool  `json:"requested"`
+	ID         int64 `json:"id"`
+	Following  bool  `json:"following"`
+	FollowedBy bool  `json:"followed_by"`
+	Blocking   bool  `json:"blocking"`
+	Muting     bool  `json:"muting"`
+	Requested  bool  `json:"requested"`
 }
 
 // Report represents a Mastodon report entity
@@ -144,6 +143,7 @@ type Status struct {
 	FavouritesCount    int64        `json:"favourites_count"`
 	Reblogged          bool         `json:"reblogged"`
 	Favourited         bool         `json:"favourited"`
+	Muted              bool         `json:"muted"`
 	Sensitive          bool         `json:"sensitive"`
 	SpoilerText        string       `json:"spoiler_text"`
 	Visibility         string       `json:"visibility"`
