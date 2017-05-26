@@ -149,6 +149,7 @@ type Status struct {
 	Mentions           []Mention    `json:"mentions"`
 	Tags               []Tag        `json:"tags"`
 	Application        Application  `json:"application"`
+	Language           string       `json:"language"`
 }
 
 // Tag represents a Mastodon tag entity
