@@ -193,27 +193,27 @@ func (mc *Client) GetAccountFollowing(accountID int64, lopt *LimitParams) ([]Acc
 }
 
 // FollowAccount follows an account
-func (mc *Client) FollowAccount(accountID int64) error {
+func (mc *Client) FollowAccount(accountID int64) (*Relationship, error) {
 	rel, err := mc.updateRelationship("follow", accountID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if rel == nil {
-		return ErrEntityNotFound
+		return nil, ErrEntityNotFound
 	}
-	return nil
+	return rel, nil
 }
 
 // UnfollowAccount unfollows an account
-func (mc *Client) UnfollowAccount(accountID int64) error {
+func (mc *Client) UnfollowAccount(accountID int64) (*Relationship, error) {
 	rel, err := mc.updateRelationship("unfollow", accountID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if rel == nil {
-		return ErrEntityNotFound
+		return nil, ErrEntityNotFound
 	}
-	return nil
+	return rel, nil
 }
 
 // FollowRemoteAccount follows a remote account
@@ -237,51 +237,51 @@ func (mc *Client) FollowRemoteAccount(uri string) (*Account, error) {
 }
 
 // BlockAccount blocks an account
-func (mc *Client) BlockAccount(accountID int64) error {
+func (mc *Client) BlockAccount(accountID int64) (*Relationship, error) {
 	rel, err := mc.updateRelationship("block", accountID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if rel == nil {
-		return ErrEntityNotFound
+		return nil, ErrEntityNotFound
 	}
-	return nil
+	return rel, nil
 }
 
 // UnblockAccount unblocks an account
-func (mc *Client) UnblockAccount(accountID int64) error {
+func (mc *Client) UnblockAccount(accountID int64) (*Relationship, error) {
 	rel, err := mc.updateRelationship("unblock", accountID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if rel == nil {
-		return ErrEntityNotFound
+		return nil, ErrEntityNotFound
 	}
-	return nil
+	return rel, nil
 }
 
 // MuteAccount mutes an account
-func (mc *Client) MuteAccount(accountID int64) error {
+func (mc *Client) MuteAccount(accountID int64) (*Relationship, error) {
 	rel, err := mc.updateRelationship("mute", accountID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if rel == nil {
-		return ErrEntityNotFound
+		return nil, ErrEntityNotFound
 	}
-	return nil
+	return rel, nil
 }
 
 // UnmuteAccount unmutes an account
-func (mc *Client) UnmuteAccount(accountID int64) error {
+func (mc *Client) UnmuteAccount(accountID int64) (*Relationship, error) {
 	rel, err := mc.updateRelationship("unmute", accountID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if rel == nil {
-		return ErrEntityNotFound
+		return nil, ErrEntityNotFound
 	}
-	return nil
+	return rel, nil
 }
 
 // SearchAccounts returns a list of accounts matching the query string
