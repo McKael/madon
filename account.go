@@ -32,9 +32,31 @@ type getAccountsOptions struct {
 	Limit *LimitParams
 }
 
+// updateRelationship returns a Relationship entity
+// The operation 'op' can be "follow", "unfollow", "block", "unblock",
+// "mute", "unmute".
+// The id is optional and depends on the operation.
+func (mc *Client) updateRelationship(op string, id int64) (*Relationship, error) {
+	var endPoint string
+	method := rest.Post
+	strID := strconv.FormatInt(id, 10)
+
+	switch op {
+	case "follow", "unfollow", "block", "unblock", "mute", "unmute":
+		endPoint = "accounts/" + strID + "/" + op
+	default:
+		return nil, ErrInvalidParameter
+	}
+
+	var rel Relationship
+	if err := mc.apiCall(endPoint, method, nil, nil, nil, &rel); err != nil {
+		return nil, err
+	}
+	return &rel, nil
+}
+
 // getSingleAccount returns an account entity
-// The operation 'op' can be "account", "verify_credentials", "follow",
-// "unfollow", "block", "unblock", "mute", "unmute",
+// The operation 'op' can be "account", "verify_credentials",
 // "follow_requests/authorize" or // "follow_requests/reject".
 // The id is optional and depends on the operation.
 func (mc *Client) getSingleAccount(op string, id int64) (*Account, error) {
@@ -47,9 +69,6 @@ func (mc *Client) getSingleAccount(op string, id int64) (*Account, error) {
 		endPoint = "accounts/" + strID
 	case "verify_credentials":
 		endPoint = "accounts/verify_credentials"
-	case "follow", "unfollow", "block", "unblock", "mute", "unmute":
-		endPoint = "accounts/" + strID + "/" + op
-		method = rest.Post
 	case "follow_requests/authorize", "follow_requests/reject":
 		// The documentation is incorrect, the endpoint actually
 		// is "follow_requests/:id/{authorize|reject}"
@@ -175,11 +194,11 @@ func (mc *Client) GetAccountFollowing(accountID int64, lopt *LimitParams) ([]Acc
 
 // FollowAccount follows an account
 func (mc *Client) FollowAccount(accountID int64) error {
-	account, err := mc.getSingleAccount("follow", accountID)
+	rel, err := mc.updateRelationship("follow", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != accountID {
+	if rel == nil {
 		return ErrEntityNotFound
 	}
 	return nil
@@ -187,11 +206,11 @@ func (mc *Client) FollowAccount(accountID int64) error {
 
 // UnfollowAccount unfollows an account
 func (mc *Client) UnfollowAccount(accountID int64) error {
-	account, err := mc.getSingleAccount("unfollow", accountID)
+	rel, err := mc.updateRelationship("unfollow", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != accountID {
+	if rel == nil {
 		return ErrEntityNotFound
 	}
 	return nil
@@ -219,11 +238,11 @@ func (mc *Client) FollowRemoteAccount(uri string) (*Account, error) {
 
 // BlockAccount blocks an account
 func (mc *Client) BlockAccount(accountID int64) error {
-	account, err := mc.getSingleAccount("block", accountID)
+	rel, err := mc.updateRelationship("block", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != accountID {
+	if rel == nil {
 		return ErrEntityNotFound
 	}
 	return nil
@@ -231,11 +250,11 @@ func (mc *Client) BlockAccount(accountID int64) error {
 
 // UnblockAccount unblocks an account
 func (mc *Client) UnblockAccount(accountID int64) error {
-	account, err := mc.getSingleAccount("unblock", accountID)
+	rel, err := mc.updateRelationship("unblock", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != accountID {
+	if rel == nil {
 		return ErrEntityNotFound
 	}
 	return nil
@@ -243,11 +262,11 @@ func (mc *Client) UnblockAccount(accountID int64) error {
 
 // MuteAccount mutes an account
 func (mc *Client) MuteAccount(accountID int64) error {
-	account, err := mc.getSingleAccount("mute", accountID)
+	rel, err := mc.updateRelationship("mute", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != accountID {
+	if rel == nil {
 		return ErrEntityNotFound
 	}
 	return nil
@@ -255,11 +274,11 @@ func (mc *Client) MuteAccount(accountID int64) error {
 
 // UnmuteAccount unmutes an account
 func (mc *Client) UnmuteAccount(accountID int64) error {
-	account, err := mc.getSingleAccount("unmute", accountID)
+	rel, err := mc.updateRelationship("unmute", accountID)
 	if err != nil {
 		return err
 	}
-	if account != nil && account.ID != accountID {
+	if rel == nil {
 		return ErrEntityNotFound
 	}
 	return nil
