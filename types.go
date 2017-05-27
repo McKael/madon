@@ -55,13 +55,26 @@ type Application struct {
 
 // Attachment represents a Mastodon attachement entity
 type Attachment struct {
-	ID         int64        `json:"id"`
-	Type       string       `json:"type"`
-	URL        string       `json:"url"`
-	RemoteURL  *string      `json:"remote_url"`
-	PreviewURL string       `json:"preview_url"`
-	TextURL    *string      `json:"text_url"`
-	Meta       *interface{} `json:"meta"`
+	ID         int64   `json:"id"`
+	Type       string  `json:"type"`
+	URL        string  `json:"url"`
+	RemoteURL  *string `json:"remote_url"`
+	PreviewURL string  `json:"preview_url"`
+	TextURL    *string `json:"text_url"`
+	Meta       *struct {
+		Original struct {
+			Size   string  `json:"size"`
+			Aspect float64 `json:"aspect"`
+			Width  int     `json:"width"`
+			Height int     `json:"height"`
+		} `json:"original"`
+		Small struct {
+			Size   string  `json:"size"`
+			Aspect float64 `json:"aspect"`
+			Width  int     `json:"width"`
+			Height int     `json:"height"`
+		} `json:"small"`
+	} `json:"meta"`
 }
 
 // Card represents a Mastodon card entity
