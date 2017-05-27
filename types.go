@@ -52,20 +52,29 @@ type Application struct {
 
 // Attachment represents a Mastodon attachement entity
 type Attachment struct {
-	ID         int64  `json:"id"`
-	Type       string `json:"type"`
-	URL        string `json:"url"`
-	RemoteURL  string `json:"remote_url"`
-	PreviewURL string `json:"preview_url"`
-	TextURL    string `json:"text_url"`
+	ID         int64        `json:"id"`
+	Type       string       `json:"type"`
+	URL        string       `json:"url"`
+	RemoteURL  *string      `json:"remote_url"`
+	PreviewURL string       `json:"preview_url"`
+	TextURL    *string      `json:"text_url"`
+	Meta       *interface{} `json:"meta"`
 }
 
 // Card represents a Mastodon card entity
 type Card struct {
-	URL         string `json:"url"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Image       string `json:"image"`
+	URL          string  `json:"url"`
+	Title        string  `json:"title"`
+	Description  string  `json:"description"`
+	Image        string  `json:"image"`
+	Type         *string `json:"type"`
+	AuthorName   *string `json:"author_name"`
+	AuthorURL    *string `json:"author_url"`
+	ProviderName *string `json:"provider_name"`
+	ProviderURL  *string `json:"provider_url"`
+	HTML         *string `json:"html"`
+	Width        *int    `json:"width"`
+	Height       *int    `json:"height"`
 }
 
 // Context represents a Mastodon context entity
@@ -107,12 +116,13 @@ type Notification struct {
 
 // Relationship represents a Mastodon relationship entity
 type Relationship struct {
-	ID         int64 `json:"id"`
-	Following  bool  `json:"following"`
-	FollowedBy bool  `json:"followed_by"`
-	Blocking   bool  `json:"blocking"`
-	Muting     bool  `json:"muting"`
-	Requested  bool  `json:"requested"`
+	ID             int64 `json:"id"`
+	Following      bool  `json:"following"`
+	FollowedBy     bool  `json:"followed_by"`
+	Blocking       bool  `json:"blocking"`
+	Muting         bool  `json:"muting"`
+	Requested      bool  `json:"requested"`
+	DomainBlocking bool  `jsin:"domain_blocking"`
 }
 
 // Report represents a Mastodon report entity
