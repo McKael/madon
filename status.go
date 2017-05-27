@@ -78,7 +78,8 @@ func (mc *Client) queryStatusData(statusID int64, op string, data interface{}) e
 
 // updateStatusData updates the statuses
 // The operation 'op' can be empty or "status" (to post a status), "delete"
-// (for deleting a status), "reblog", "unreblog", "favourite", "unfavourite".
+// (for deleting a status), "reblog", "unreblog", "favourite", "unfavourite",
+// mute or unmute (for conversations).
 // The data argument will receive the object(s) returned by the API server.
 func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data interface{}) error {
 	method := rest.Post
@@ -107,6 +108,11 @@ func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data int
 		}
 		endPoint += "/" + strconv.FormatInt(opts.ID, 10)
 	case "reblog", "unreblog", "favourite", "unfavourite":
+		if opts.ID < 1 {
+			return ErrInvalidID
+		}
+		endPoint += "/" + strconv.FormatInt(opts.ID, 10) + "/" + op
+	case "mute", "unmute":
 		if opts.ID < 1 {
 			return ErrInvalidID
 		}
@@ -249,4 +255,20 @@ func (mc *Client) UnfavouriteStatus(statusID int64) error {
 	o := updateStatusOptions{ID: statusID}
 	err := mc.updateStatusData("unfavourite", o, &status)
 	return err
+}
+
+// MuteConversation mutes the conversation containing a status
+func (mc *Client) MuteConversation(statusID int64) (*Status, error) {
+	var status Status
+	o := updateStatusOptions{ID: statusID}
+	err := mc.updateStatusData("mute", o, &status)
+	return &status, err
+}
+
+// UnmuteConversation unmutes the conversation containing a status
+func (mc *Client) UnmuteConversation(statusID int64) (*Status, error) {
+	var status Status
+	o := updateStatusOptions{ID: statusID}
+	err := mc.updateStatusData("unmute", o, &status)
+	return &status, err
 }
