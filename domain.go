@@ -10,10 +10,10 @@ import (
 	"github.com/sendgrid/rest"
 )
 
-// GetDomainBlocks returns the current user blocked domains
+// GetBlockedDomains returns the current user blocked domains
 // If lopt.All is true, several requests will be made until the API server
 // has nothing to return.
-func (mc *Client) GetDomainBlocks(lopt *LimitParams) ([]DomainName, error) {
+func (mc *Client) GetBlockedDomains(lopt *LimitParams) ([]DomainName, error) {
 	const endPoint = "domain_blocks"
 	var links apiLinks
 	var domains []DomainName
@@ -35,16 +35,16 @@ func (mc *Client) GetDomainBlocks(lopt *LimitParams) ([]DomainName, error) {
 	return domains, nil
 }
 
-// DomainBlock blocks the specified domain
-func (mc *Client) DomainBlock(domain DomainName) error {
+// BlockDomain blocks the specified domain
+func (mc *Client) BlockDomain(domain DomainName) error {
 	const endPoint = "domain_blocks"
 	params := make(apiCallParams)
 	params["domain"] = string(domain)
 	return mc.apiCall(endPoint, rest.Post, params, nil, nil, nil)
 }
 
-// DomainUnblock unblocks the specified domain
-func (mc *Client) DomainUnblock(domain DomainName) error {
+// UnblockDomain unblocks the specified domain
+func (mc *Client) UnblockDomain(domain DomainName) error {
 	const endPoint = "domain_blocks"
 	params := make(apiCallParams)
 	params["domain"] = string(domain)
