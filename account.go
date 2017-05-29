@@ -217,7 +217,7 @@ func (mc *Client) UnfollowAccount(accountID int64) (*Relationship, error) {
 }
 
 // FollowRemoteAccount follows a remote account
-// The parameter 'uri' is a URI (e.mc. "username@domain").
+// The parameter 'uri' is a URI (e.g. "username@domain").
 func (mc *Client) FollowRemoteAccount(uri string) (*Account, error) {
 	if uri == "" {
 		return nil, ErrInvalidID
