@@ -129,13 +129,13 @@ func (mc *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, done
 			}
 			obj = notif
 		case "delete":
-			floatPayload, ok := msg.Payload.(float64)
+			strPayload, ok := msg.Payload.(string)
 			if !ok {
-				e := errors.New("could not decode deletion: payload isn't a number")
+				e := errors.New("could not decode deletion: payload isn't a string")
 				events <- StreamEvent{Event: "error", Error: e}
 				continue
 			}
-			obj = int64(floatPayload) // statusID
+			obj = strPayload // statusID
 		default:
 			e := errors.Errorf("unhandled event '%s'", msg.Event)
 			events <- StreamEvent{Event: "error", Error: e}
