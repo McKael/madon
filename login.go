@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 
 	"github.com/pkg/errors"
@@ -117,7 +118,7 @@ func (mc *Client) LoginOAuth2(code string, scopes []string) (string, error) {
 	}
 
 	// Return token
-	t, err := conf.Exchange(nil, code)
+	t, err := conf.Exchange(context.TODO(), code)
 	if err != nil {
 		return "", errors.Wrap(err, "cannot convert code into a token")
 	}
