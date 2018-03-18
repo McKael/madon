@@ -372,10 +372,11 @@ func (mc *Client) FollowRequestAuthorize(accountID int64, authorize bool) error 
 // The fields avatar & headerImage can contain base64-encoded images; if
 // they do not (that is; if they don't contain ";base64,"), they are considered
 // as file paths and their content will be encoded.
+// Setting 'locked' to true means all followers should be approved.
 // All fields can be nil, in which case they are not updated.
 // displayName and note can be set to "" to delete previous values;
 // I'm not sure images can be deleted -- only replaced AFAICS.
-func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string) (*Account, error) {
+func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string, locked *bool) (*Account, error) {
 	const endPoint = "accounts/update_credentials"
 	params := make(apiCallParams)
 
@@ -384,6 +385,13 @@ func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string) 
 	}
 	if note != nil {
 		params["note"] = *note
+	}
+	if locked != nil {
+		if *locked {
+			params["locked"] = "true"
+		} else {
+			params["locked"] = "false"
+		}
 	}
 
 	var err error
