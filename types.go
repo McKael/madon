@@ -1,6 +1,6 @@
 /*
 Copyright 2017 Ollivier Robert
-Copyright 2017 Mikael Berthe
+Copyright 2017-2018 Mikael Berthe
 
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
@@ -45,6 +45,11 @@ type Account struct {
 	FollowersCount int64     `json:"followers_count"`
 	FollowingCount int64     `json:"following_count"`
 	StatusesCount  int64     `json:"statuses_count"`
+	Source         *struct { // Used for verify_credentials
+		Privacy   string `json:"privacy"`
+		Sensitive bool   `json:"sensitive"`
+		Note      string `json:"note"`
+	} `json:"source"`
 }
 
 // Application represents a Mastodon application entity
@@ -75,6 +80,7 @@ type Attachment struct {
 			Height int     `json:"height"`
 		} `json:"small"`
 	} `json:"meta"`
+	Description *string `json:"description"`
 }
 
 // Card represents a Mastodon card entity
@@ -99,6 +105,14 @@ type Context struct {
 	Descendants []Status `json:"descendants"`
 }
 
+// Emoji represents a Mastodon emoji entity
+type Emoji struct {
+	ShortCode       string `json:"shortcode"`
+	URL             string `json:"url"`
+	StaticURL       string `json:"static_url"`
+	VisibleInPicker bool   `json:"visible_in_picker"`
+}
+
 // Error represents a Mastodon error entity
 type Error struct {
 	Text string `json:"error"`
@@ -120,7 +134,15 @@ type Instance struct {
 		StatusCount int64 `json:"status_count"`
 		DomainCount int64 `json:"domain_count"`
 	} `json:"stats"`
-	Thumbnail *string `json:"thumbnail"`
+	Thumbnail      *string  `json:"thumbnail"`
+	Languages      []string `json:"languages"`
+	ContactAccount *Account `json:"contact_account"`
+}
+
+// List represents a Mastodon list entity
+type List struct {
+	ID    int64  `json:"id,string"`
+	Title string `json:"title"`
 }
 
 // Mention represents a Mastodon mention entity
@@ -142,13 +164,14 @@ type Notification struct {
 
 // Relationship represents a Mastodon relationship entity
 type Relationship struct {
-	ID             int64 `json:"id,string"`
-	Following      bool  `json:"following"`
-	FollowedBy     bool  `json:"followed_by"`
-	Blocking       bool  `json:"blocking"`
-	Muting         bool  `json:"muting"`
-	Requested      bool  `json:"requested"`
-	DomainBlocking bool  `jsin:"domain_blocking"`
+	ID                  int64 `json:"id,string"`
+	Following           bool  `json:"following"`
+	FollowedBy          bool  `json:"followed_by"`
+	Blocking            bool  `json:"blocking"`
+	Muting              bool  `json:"muting"`
+	Requested           bool  `json:"requested"`
+	DomainBlocking      bool  `jsin:"domain_blocking"`
+	MutingNotifications bool  `json:"muting_notifications"`
 }
 
 // Report represents a Mastodon report entity
@@ -181,11 +204,13 @@ type Status struct {
 	Favourited         bool         `json:"favourited"`
 	Muted              bool         `json:"muted"`
 	Sensitive          bool         `json:"sensitive"`
+	Pinned             bool         `json:"pinned"`
 	SpoilerText        string       `json:"spoiler_text"`
 	Visibility         string       `json:"visibility"`
 	MediaAttachments   []Attachment `json:"media_attachments"`
 	Mentions           []Mention    `json:"mentions"`
 	Tags               []Tag        `json:"tags"`
+	Emojis             []Emoji      `json:"emojis"`
 	Application        *Application `json:"application"`
 	Language           *string      `json:"language"`
 }
