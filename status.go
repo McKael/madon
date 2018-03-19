@@ -78,8 +78,8 @@ func (mc *Client) queryStatusData(statusID int64, op string, data interface{}) e
 
 // updateStatusData updates the statuses
 // The operation 'op' can be empty or "status" (to post a status), "delete"
-// (for deleting a status), "reblog", "unreblog", "favourite", "unfavourite",
-// mute or unmute (for conversations).
+// (for deleting a status), "reblog"/"unreblog", "favourite"/"unfavourite",
+// "mute"/"unmute" (for conversations) or "pin"/"unpin".
 // The data argument will receive the object(s) returned by the API server.
 func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data interface{}) error {
 	method := rest.Post
@@ -112,7 +112,7 @@ func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data int
 			return ErrInvalidID
 		}
 		endPoint += "/" + strconv.FormatInt(opts.ID, 10) + "/" + op
-	case "mute", "unmute":
+	case "mute", "unmute", "pin", "unpin":
 		if opts.ID < 1 {
 			return ErrInvalidID
 		}
@@ -254,6 +254,22 @@ func (mc *Client) UnfavouriteStatus(statusID int64) error {
 	var status Status
 	o := updateStatusOptions{ID: statusID}
 	err := mc.updateStatusData("unfavourite", o, &status)
+	return err
+}
+
+// PinStatus pins a status
+func (mc *Client) PinStatus(statusID int64) error {
+	var status Status
+	o := updateStatusOptions{ID: statusID}
+	err := mc.updateStatusData("pin", o, &status)
+	return err
+}
+
+// UnpinStatus unpins a status
+func (mc *Client) UnpinStatus(statusID int64) error {
+	var status Status
+	o := updateStatusOptions{ID: statusID}
+	err := mc.updateStatusData("unpin", o, &status)
 	return err
 }
 
