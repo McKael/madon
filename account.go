@@ -336,12 +336,13 @@ func (mc *Client) GetAccountRelationships(accountIDs []int64) ([]Relationship, e
 
 // GetAccountStatuses returns a list of status entities for the given account
 // If onlyMedia is true, returns only statuses that have media attachments.
+// If onlyPinned is true, returns only statuses that have been pinned.
 // If excludeReplies is true, skip statuses that reply to other statuses.
 // If lopt.All is true, several requests will be made until the API server
 // has nothing to return.
 // If lopt.Limit is set (and not All), several queries can be made until the
 // limit is reached.
-func (mc *Client) GetAccountStatuses(accountID int64, onlyMedia, excludeReplies bool, lopt *LimitParams) ([]Status, error) {
+func (mc *Client) GetAccountStatuses(accountID int64, onlyPinned, onlyMedia, excludeReplies bool, lopt *LimitParams) ([]Status, error) {
 	if accountID < 1 {
 		return nil, ErrInvalidID
 	}
@@ -350,6 +351,9 @@ func (mc *Client) GetAccountStatuses(accountID int64, onlyMedia, excludeReplies 
 	params := make(apiCallParams)
 	if onlyMedia {
 		params["only_media"] = "true"
+	}
+	if onlyPinned {
+		params["pinned"] = "true"
 	}
 	if excludeReplies {
 		params["exclude_replies"] = "true"
