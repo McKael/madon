@@ -1,6 +1,6 @@
 /*
-Copyright 2017 Ollivier Robert
 Copyright 2017-2018 Mikael Berthe
+Copyright 2017 Ollivier Robert
 
 Licensed under the MIT license.  Please see the LICENSE file is this directory.
 */
