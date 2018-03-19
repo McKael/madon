@@ -26,6 +26,9 @@ type getAccountsOptions struct {
 	// The ID is used for most commands
 	ID int64
 
+	// Following can be set to true to limit a search to "following" accounts
+	Following bool
+
 	// The Q field (query) is used when searching for accounts
 	Q string
 
@@ -149,6 +152,9 @@ func (mc *Client) getMultipleAccountsHelper(op string, opts *getAccountsOptions)
 	params := make(apiCallParams)
 	if op == "search" {
 		params["q"] = opts.Q
+		if opts.Following {
+			params["following"] = "true"
+		}
 	}
 
 	return mc.getMultipleAccounts(endPoint, params, lopt)
@@ -299,8 +305,8 @@ func (mc *Client) UnmuteAccount(accountID int64) (*Relationship, error) {
 
 // SearchAccounts returns a list of accounts matching the query string
 // The lopt parameter is optional (can be nil) or can be used to set a limit.
-func (mc *Client) SearchAccounts(query string, lopt *LimitParams) ([]Account, error) {
-	o := &getAccountsOptions{Q: query, Limit: lopt}
+func (mc *Client) SearchAccounts(query string, following bool, lopt *LimitParams) ([]Account, error) {
+	o := &getAccountsOptions{Q: query, Limit: lopt, Following: following}
 	return mc.getMultipleAccountsHelper("search", o)
 }
 
