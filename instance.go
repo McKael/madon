@@ -18,3 +18,21 @@ func (mc *Client) GetCurrentInstance() (*Instance, error) {
 	}
 	return &i, nil
 }
+
+// GetInstancePeers returns current instance peers
+func (mc *Client) GetInstancePeers() ([]string, error) {
+	var peers []string
+	if err := mc.apiCall("instance/peers", rest.Get, nil, nil, nil, &peers); err != nil {
+		return nil, err
+	}
+	return peers, nil
+}
+
+// GetInstanceActivity returns current instance activity
+func (mc *Client) GetInstanceActivity() (interface{}, error) {
+	var activity interface{}
+	if err := mc.apiCall("instance/activity", rest.Get, nil, nil, nil, &activity); err != nil {
+		return nil, err
+	}
+	return activity, nil
+}
