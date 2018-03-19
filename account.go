@@ -36,7 +36,7 @@ type getAccountsOptions struct {
 // The operation 'op' can be "follow", "unfollow", "block", "unblock",
 // "mute", "unmute".
 // The id is optional and depends on the operation.
-func (mc *Client) updateRelationship(op string, id int64) (*Relationship, error) {
+func (mc *Client) updateRelationship(op string, id int64, params apiCallParams) (*Relationship, error) {
 	var endPoint string
 	method := rest.Post
 	strID := strconv.FormatInt(id, 10)
@@ -49,7 +49,7 @@ func (mc *Client) updateRelationship(op string, id int64) (*Relationship, error)
 	}
 
 	var rel Relationship
-	if err := mc.apiCall(endPoint, method, nil, nil, nil, &rel); err != nil {
+	if err := mc.apiCall(endPoint, method, params, nil, nil, &rel); err != nil {
 		return nil, err
 	}
 	return &rel, nil
@@ -194,7 +194,7 @@ func (mc *Client) GetAccountFollowing(accountID int64, lopt *LimitParams) ([]Acc
 
 // FollowAccount follows an account
 func (mc *Client) FollowAccount(accountID int64) (*Relationship, error) {
-	rel, err := mc.updateRelationship("follow", accountID)
+	rel, err := mc.updateRelationship("follow", accountID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +206,7 @@ func (mc *Client) FollowAccount(accountID int64) (*Relationship, error) {
 
 // UnfollowAccount unfollows an account
 func (mc *Client) UnfollowAccount(accountID int64) (*Relationship, error) {
-	rel, err := mc.updateRelationship("unfollow", accountID)
+	rel, err := mc.updateRelationship("unfollow", accountID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func (mc *Client) FollowRemoteAccount(uri string) (*Account, error) {
 
 // BlockAccount blocks an account
 func (mc *Client) BlockAccount(accountID int64) (*Relationship, error) {
-	rel, err := mc.updateRelationship("block", accountID)
+	rel, err := mc.updateRelationship("block", accountID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -250,7 +250,7 @@ func (mc *Client) BlockAccount(accountID int64) (*Relationship, error) {
 
 // UnblockAccount unblocks an account
 func (mc *Client) UnblockAccount(accountID int64) (*Relationship, error) {
-	rel, err := mc.updateRelationship("unblock", accountID)
+	rel, err := mc.updateRelationship("unblock", accountID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -261,8 +261,21 @@ func (mc *Client) UnblockAccount(accountID int64) (*Relationship, error) {
 }
 
 // MuteAccount mutes an account
-func (mc *Client) MuteAccount(accountID int64) (*Relationship, error) {
-	rel, err := mc.updateRelationship("mute", accountID)
+// Note that with current Mastodon API, muteNotifications defaults to true
+// when it is not provided.
+func (mc *Client) MuteAccount(accountID int64, muteNotifications *bool) (*Relationship, error) {
+	var params apiCallParams
+
+	if muteNotifications != nil {
+		params = make(apiCallParams)
+		if *muteNotifications {
+			params["notifications"] = "true"
+		} else {
+			params["notifications"] = "false"
+		}
+	}
+
+	rel, err := mc.updateRelationship("mute", accountID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +287,7 @@ func (mc *Client) MuteAccount(accountID int64) (*Relationship, error) {
 
 // UnmuteAccount unmutes an account
 func (mc *Client) UnmuteAccount(accountID int64) (*Relationship, error) {
-	rel, err := mc.updateRelationship("unmute", accountID)
+	rel, err := mc.updateRelationship("unmute", accountID, nil)
 	if err != nil {
 		return nil, err
 	}
