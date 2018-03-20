@@ -20,8 +20,8 @@ func (mc *Client) GetCurrentInstance() (*Instance, error) {
 }
 
 // GetInstancePeers returns current instance peers
-func (mc *Client) GetInstancePeers() ([]string, error) {
-	var peers []string
+func (mc *Client) GetInstancePeers() ([]InstancePeer, error) {
+	var peers []InstancePeer
 	if err := mc.apiCall("instance/peers", rest.Get, nil, nil, nil, &peers); err != nil {
 		return nil, err
 	}

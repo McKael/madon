@@ -29,6 +29,9 @@ Entities - Everything manipulated/returned by the API
 // DomainName is a domain name string, as returned by the domain_blocks API
 type DomainName string
 
+// InstancePeer is a peer name, as returned by the instance/peers API
+type InstancePeer string
+
 // Account represents a Mastodon account entity
 type Account struct {
 	ID             int64     `json:"id,string"`
