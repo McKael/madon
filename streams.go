@@ -25,18 +25,24 @@ type StreamEvent struct {
 // openStream opens a stream URL and returns an http.Response
 // Note that the caller should close the connection when it's done reading
 // the stream.
-// The stream name can be "user", "local", "public" or "hashtag".
-// When it is "hashtag", the hashTag argument cannot be empty.
-func (mc *Client) openStream(streamName, hashTag string) (*websocket.Conn, error) {
-	var tag string
+// The stream name can be "user", "local", "public", "list" or "hashtag".
+// When it is "hashtag", the param argument contains the hashtag.
+// When it is "list", the param argument contains the list ID.
+func (mc *Client) openStream(streamName, param string) (*websocket.Conn, error) {
+	var tag, list string
 
 	switch streamName {
 	case "user", "public", "public:local":
 	case "hashtag":
-		if hashTag == "" {
+		if param == "" {
 			return nil, ErrInvalidParameter
 		}
-		tag = hashTag
+		tag = param
+	case "list":
+		if param == "" {
+			return nil, ErrInvalidParameter
+		}
+		list = param
 	default:
 		return nil, ErrInvalidParameter
 	}
@@ -56,6 +62,8 @@ func (mc *Client) openStream(streamName, hashTag string) (*websocket.Conn, error
 	urlParams.Add("access_token", mc.UserToken.AccessToken)
 	if tag != "" {
 		urlParams.Add("tag", tag)
+	} else if list != "" {
+		urlParams.Add("list", list)
 	}
 	u.RawQuery = urlParams.Encode()
 
