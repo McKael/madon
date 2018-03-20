@@ -199,8 +199,18 @@ func (mc *Client) GetAccountFollowing(accountID int64, lopt *LimitParams) ([]Acc
 }
 
 // FollowAccount follows an account
-func (mc *Client) FollowAccount(accountID int64) (*Relationship, error) {
-	rel, err := mc.updateRelationship("follow", accountID, nil)
+// 'reblogs' can be used to specify if boots should be displayed or hidden.
+func (mc *Client) FollowAccount(accountID int64, reblogs *bool) (*Relationship, error) {
+	var params apiCallParams
+	if reblogs != nil {
+		params = make(apiCallParams)
+		if *reblogs {
+			params["reblogs"] = "true"
+		} else {
+			params["reblogs"] = "false"
+		}
+	}
+	rel, err := mc.updateRelationship("follow", accountID, params)
 	if err != nil {
 		return nil, err
 	}
