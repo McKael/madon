@@ -7,20 +7,33 @@ Licensed under the MIT license.  Please see the LICENSE file is this directory.
 package madon
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/sendgrid/rest"
 )
 
 // GetNotifications returns the list of the user's notifications
+// excludeTypes is an array of notifications to exclude ("follow", "favourite",
+// "reblog", "mention").  It can be nil.
 // If lopt.All is true, several requests will be made until the API server
 // has nothing to return.
 // If lopt.Limit is set (and not All), several queries can be made until the
 // limit is reached.
-func (mc *Client) GetNotifications(lopt *LimitParams) ([]Notification, error) {
+func (mc *Client) GetNotifications(excludeTypes []string, lopt *LimitParams) ([]Notification, error) {
 	var notifications []Notification
 	var links apiLinks
-	if err := mc.apiCall("notifications", rest.Get, nil, lopt, &links, &notifications); err != nil {
+	var params apiCallParams
+
+	if len(excludeTypes) > 0 {
+		params = make(apiCallParams)
+		for i, eType := range excludeTypes {
+			qID := fmt.Sprintf("exclude_types[%d]", i+1)
+			params[qID] = eType
+		}
+	}
+
+	if err := mc.apiCall("notifications", rest.Get, params, lopt, &links, &notifications); err != nil {
 		return nil, err
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
