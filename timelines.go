@@ -13,7 +13,8 @@ import (
 )
 
 // GetTimelines returns a timeline (a list of statuses
-// timeline can be "home", "public", or a hashtag (use ":hashtag" or "#hashtag")
+// timeline can be "home", "public", a hashtag (use ":hashtag" or "#hashtag")
+// or a list (use "!N", e.g. "!42" for list ID #42).
 // For the public timelines, you can set 'local' to true to get only the
 // local instance.
 // If lopt.All is true, several requests will be made until the API server
@@ -32,6 +33,14 @@ func (mc *Client) GetTimelines(timeline string, local bool, lopt *LimitParams) (
 			return nil, errors.New("timelines API: empty hashtag")
 		}
 		endPoint = "timelines/tag/" + hashtag
+	case len(timeline) > 1 && strings.HasPrefix(timeline, "!"):
+		// Check the timeline is a number
+		for _, n := range timeline[1:] {
+			if n < '0' || n > '9' {
+				return nil, errors.New("timelines API: invalid list ID")
+			}
+		}
+		endPoint = "timelines/list/" + timeline[1:]
 	default:
 		return nil, errors.New("GetTimelines: bad timelines argument")
 	}
