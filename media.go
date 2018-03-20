@@ -19,7 +19,9 @@ import (
 )
 
 // UploadMedia uploads the given file and returns an attachment
-func (mc *Client) UploadMedia(filePath string) (*Attachment, error) {
+// The description and focus arguments can be empty strings.
+// 'focus' is the "focal point", written as two comma-delimited floating points.
+func (mc *Client) UploadMedia(filePath, description, focus string) (*Attachment, error) {
 	var b bytes.Buffer
 
 	if filePath == "" {
@@ -43,7 +45,18 @@ func (mc *Client) UploadMedia(filePath string) (*Attachment, error) {
 
 	w.Close()
 
-	req, err := mc.prepareRequest("media", rest.Post, nil)
+	var params apiCallParams
+	if description != "" || focus != "" {
+		params = make(apiCallParams)
+		if description != "" {
+			params["description"] = description
+		}
+		if focus != "" {
+			params["focus"] = focus
+		}
+	}
+
+	req, err := mc.prepareRequest("media", rest.Post, params)
 	if err != nil {
 		return nil, errors.Wrap(err, "media prepareRequest failed")
 	}
