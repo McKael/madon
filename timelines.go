@@ -17,11 +17,12 @@ import (
 // or a list (use "!N", e.g. "!42" for list ID #42).
 // For the public timelines, you can set 'local' to true to get only the
 // local instance.
+// Set 'onlyMedia' to true to only get statuses that have media attachments.
 // If lopt.All is true, several requests will be made until the API server
 // has nothing to return.
 // If lopt.Limit is set (and not All), several queries can be made until the
 // limit is reached.
-func (mc *Client) GetTimelines(timeline string, local bool, lopt *LimitParams) ([]Status, error) {
+func (mc *Client) GetTimelines(timeline string, local, onlyMedia bool, lopt *LimitParams) ([]Status, error) {
 	var endPoint string
 
 	switch {
@@ -48,6 +49,9 @@ func (mc *Client) GetTimelines(timeline string, local bool, lopt *LimitParams) (
 	params := make(apiCallParams)
 	if timeline == "public" && local {
 		params["local"] = "true"
+	}
+	if onlyMedia {
+		params["only_media"] = "true"
 	}
 
 	return mc.getMultipleStatuses(endPoint, params, lopt)
