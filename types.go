@@ -42,6 +42,7 @@ type Account struct {
 	URL            string    `json:"url"`
 	Avatar         string    `json:"avatar"`
 	AvatarStatic   string    `json:"avatar_static"`
+	Header         string    `json:"header"`
 	HeaderStatic   string    `json:"header_static"`
 	Locked         bool      `json:"locked"`
 	CreatedAt      time.Time `json:"created_at"`
@@ -61,7 +62,7 @@ type Application struct {
 	Website string `json:"website"`
 }
 
-// Attachment represents a Mastodon attachement entity
+// Attachment represents a Mastodon media attachment entity
 type Attachment struct {
 	ID         int64   `json:"id,string"`
 	Type       string  `json:"type"`
@@ -86,7 +87,7 @@ type Attachment struct {
 	Description *string `json:"description"`
 }
 
-// Card represents a Mastodon card entity
+// Card represents a Mastodon preview card entity
 type Card struct {
 	URL          string  `json:"url"`
 	Title        string  `json:"title"`
@@ -97,6 +98,7 @@ type Card struct {
 	AuthorURL    *string `json:"author_url"`
 	ProviderName *string `json:"provider_name"`
 	ProviderURL  *string `json:"provider_url"`
+	EmbedURL     *string `json:"embed_url"`
 	HTML         *string `json:"html"`
 	Width        *int    `json:"width"`
 	Height       *int    `json:"height"`
@@ -167,14 +169,15 @@ type Notification struct {
 
 // Relationship represents a Mastodon relationship entity
 type Relationship struct {
-	ID                  int64 `json:"id,string"`
-	Following           bool  `json:"following"`
-	FollowedBy          bool  `json:"followed_by"`
-	Blocking            bool  `json:"blocking"`
-	Muting              bool  `json:"muting"`
-	Requested           bool  `json:"requested"`
-	DomainBlocking      bool  `jsin:"domain_blocking"`
-	MutingNotifications bool  `json:"muting_notifications"`
+	ID        int64 `json:"id,string"`
+	Following bool  `json:"following"`
+	//ShowingReblogs      bool  `json:"showing_reblogs"` // Incoherent type
+	FollowedBy          bool `json:"followed_by"`
+	Blocking            bool `json:"blocking"`
+	Muting              bool `json:"muting"`
+	Requested           bool `json:"requested"`
+	DomainBlocking      bool `jsin:"domain_blocking"`
+	MutingNotifications bool `json:"muting_notifications"`
 }
 
 // Report represents a Mastodon report entity
@@ -183,7 +186,7 @@ type Report struct {
 	ActionTaken string `json:"action_taken"`
 }
 
-// Results represents a Mastodon results entity
+// Results represents a Mastodon search results entity
 type Results struct {
 	Accounts []Account `json:"accounts"`
 	Statuses []Status  `json:"statuses"`
@@ -206,8 +209,8 @@ type Status struct {
 	Reblogged          bool         `json:"reblogged"`
 	Favourited         bool         `json:"favourited"`
 	Muted              bool         `json:"muted"`
-	Sensitive          bool         `json:"sensitive"`
 	Pinned             bool         `json:"pinned"`
+	Sensitive          bool         `json:"sensitive"`
 	SpoilerText        string       `json:"spoiler_text"`
 	Visibility         string       `json:"visibility"`
 	MediaAttachments   []Attachment `json:"media_attachments"`
