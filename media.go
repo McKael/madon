@@ -13,6 +13,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/pkg/errors"
 	"github.com/sendgrid/rest"
@@ -83,6 +84,25 @@ func (mc *Client) UploadMedia(filePath, description, focus string) (*Attachment,
 	err = json.Unmarshal([]byte(r.Body), &attachment)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot decode API response (media)")
+	}
+	return &attachment, nil
+}
+
+// UpdateMedia updates the description and focal point of a media
+// One of the description and focus arguments can be nil to not be updated.
+func (mc *Client) UpdateMedia(mediaID int64, description, focus *string) (*Attachment, error) {
+	params := make(apiCallParams)
+	if description != nil {
+		params["description"] = *description
+	}
+	if focus != nil {
+		params["focus"] = *focus
+	}
+
+	endPoint := "media/" + strconv.FormatInt(mediaID, 10)
+	var attachment Attachment
+	if err := mc.apiCall(endPoint, rest.Put, params, nil, nil, &attachment); err != nil {
+		return nil, err
 	}
 	return &attachment, nil
 }
