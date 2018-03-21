@@ -4,7 +4,7 @@ Golang library for the Mastodon API
 
 [![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/McKael/madon)
 [![license](https://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/McKael/madon/master/LICENSE)
-[![build](https://img.shields.io/travis/McKael/madon.svg?style=flat)](https://travis-ci.org/McKael/madon)
+[![build](https://travis-ci.org/McKael/madon.svg?branch=master)](https://travis-ci.org/McKael/madon)
 [![Go Report Card](https://goreportcard.com/badge/github.com/McKael/madon)](https://goreportcard.com/report/github.com/McKael/madon)
 
 `madon` is a [Go](https://golang.org/) library to access the Mastondon REST API.
