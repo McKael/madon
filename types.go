@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+// ActivityTime is a custom type for the time returned by instance/activity
+type ActivityTime struct {
+	time.Time
+}
+
 // Client contains data for a madon client application
 type Client struct {
 	Name        string // Name of the client
@@ -226,4 +231,12 @@ type Status struct {
 type Tag struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
+}
+
+// WeekActivity represents a Mastodon instance activity "week" entity
+type WeekActivity struct {
+	Week          ActivityTime `json:"week"`
+	Statuses      int64        `json:"statuses,string"`
+	Logins        int64        `json:"logins,string"`
+	Registrations int64        `json:"registrations,string"`
 }
