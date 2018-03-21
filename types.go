@@ -49,6 +49,7 @@ type Account struct {
 	FollowersCount int64     `json:"followers_count"`
 	FollowingCount int64     `json:"following_count"`
 	StatusesCount  int64     `json:"statuses_count"`
+	Moved          *Account  `json:"moved"`
 	Source         *struct { // Used for verify_credentials
 		Privacy   string `json:"privacy"`
 		Sensitive bool   `json:"sensitive"`
