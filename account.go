@@ -8,14 +8,12 @@ package madon
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"mime/multipart"
-	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/sendgrid/rest"
@@ -402,14 +400,17 @@ func (mc *Client) FollowRequestAuthorize(accountID int64, authorize bool) error 
 }
 
 // UpdateAccount updates the connected user's account data
-// The fields avatar & headerImage can contain base64-encoded images; if
-// they do not (that is; if they don't contain ";base64,"), they are considered
-// as file paths and their content will be encoded.
+//
+// The fields avatar & headerImage are considered as file paths
+// and their content will be uploaded.
+// Please note that currently Mastodon leaks the avatar file name:
+// https://github.com/tootsuite/mastodon/issues/5776
+//
 // Setting 'locked' to true means all followers should be approved.
 // All fields can be nil, in which case they are not updated.
 // displayName and note can be set to "" to delete previous values;
 // I'm not sure images can be deleted -- only replaced AFAICS.
-func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string, locked *bool) (*Account, error) {
+func (mc *Client) UpdateAccount(displayName, note, avatarImagePath, headerImagePath *string, locked *bool) (*Account, error) {
 	const endPoint = "accounts/update_credentials"
 	params := make(apiCallParams)
 
@@ -428,11 +429,14 @@ func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string, 
 	}
 
 	var err error
-	avatar, err = fileToBase64(avatar, nil)
+	var avatar, headerImage []byte
+
+	avatar, err = readFile(avatarImagePath)
 	if err != nil {
 		return nil, err
 	}
-	headerImage, err = fileToBase64(headerImage, nil)
+
+	headerImage, err = readFile(headerImagePath)
 	if err != nil {
 		return nil, err
 	}
@@ -441,10 +445,18 @@ func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string, 
 	w := multipart.NewWriter(&formBuf)
 
 	if avatar != nil {
-		w.WriteField("avatar", *avatar)
+		formWriter, err := w.CreateFormFile("avatar", filepath.Base(*avatarImagePath))
+		if err != nil {
+			return nil, errors.Wrap(err, "avatar upload")
+		}
+		formWriter.Write(avatar)
 	}
 	if headerImage != nil {
-		w.WriteField("header", *headerImage)
+		formWriter, err := w.CreateFormFile("header", filepath.Base(*headerImagePath))
+		if err != nil {
+			return nil, errors.Wrap(err, "header upload")
+		}
+		formWriter.Write(headerImage)
 	}
 	w.Close()
 
@@ -479,26 +491,13 @@ func (mc *Client) UpdateAccount(displayName, note, avatar, headerImage *string, 
 	return &account, nil
 }
 
-// fileToBase64 is a helper function to convert a file's contents to
-// base64-encoded data.  Is the data string already contains base64 data, it
-// is not modified.
-// If contentType is nil, it is detected.
-func fileToBase64(data, contentType *string) (*string, error) {
-	if data == nil {
+// readFile is a helper function to read a file's contents.
+func readFile(filename *string) ([]byte, error) {
+	if filename == nil || *filename == "" {
 		return nil, nil
 	}
 
-	if *data == "" {
-		return data, nil
-	}
-
-	if strings.Contains(*data, ";base64,") {
-		return data, nil
-	}
-
-	// We need to convert the file and file name to base64
-
-	file, err := os.Open(*data)
+	file, err := os.Open(*filename)
 	if err != nil {
 		return nil, err
 	}
@@ -515,13 +514,5 @@ func fileToBase64(data, contentType *string) (*string, error) {
 		return nil, err
 	}
 
-	var cType string
-	if contentType == nil || *contentType == "" {
-		cType = http.DetectContentType(buffer[:512])
-	} else {
-		cType = *contentType
-	}
-	contentData := base64.StdEncoding.EncodeToString(buffer)
-	newData := "data:" + cType + ";base64," + contentData
-	return &newData, nil
+	return buffer, nil
 }
