@@ -33,6 +33,18 @@ type getAccountsOptions struct {
 	Limit *LimitParams
 }
 
+// UpdateAccountParams contains option fields for the UpdateAccount command
+type UpdateAccountParams struct {
+	DisplayName     *string
+	Note            *string
+	AvatarImagePath *string
+	HeaderImagePath *string
+	Locked          *bool
+	Bot             *bool
+	//FieldsAttributes *[]Field
+	//Source           *SourceParams
+}
+
 // updateRelationship returns a Relationship entity
 // The operation 'op' can be "follow", "unfollow", "block", "unblock",
 // "mute", "unmute".
@@ -406,37 +418,45 @@ func (mc *Client) FollowRequestAuthorize(accountID int64, authorize bool) error 
 // Please note that currently Mastodon leaks the avatar file name:
 // https://github.com/tootsuite/mastodon/issues/5776
 //
-// Setting 'locked' to true means all followers should be approved.
 // All fields can be nil, in which case they are not updated.
-// displayName and note can be set to "" to delete previous values;
+// 'DisplayName' and 'Note' can be set to "" to delete previous values.
+// Setting 'Locked' to true means all followers should be approved.
+// You can set 'Bot' to true to indicate this is a service (automated) account.
 // I'm not sure images can be deleted -- only replaced AFAICS.
-func (mc *Client) UpdateAccount(displayName, note, avatarImagePath, headerImagePath *string, locked *bool) (*Account, error) {
+func (mc *Client) UpdateAccount(cmdParams UpdateAccountParams) (*Account, error) {
 	const endPoint = "accounts/update_credentials"
 	params := make(apiCallParams)
 
-	if displayName != nil {
-		params["display_name"] = *displayName
+	if cmdParams.DisplayName != nil {
+		params["display_name"] = *cmdParams.DisplayName
 	}
-	if note != nil {
-		params["note"] = *note
+	if cmdParams.Note != nil {
+		params["note"] = *cmdParams.Note
 	}
-	if locked != nil {
-		if *locked {
+	if cmdParams.Locked != nil {
+		if *cmdParams.Locked {
 			params["locked"] = "true"
 		} else {
 			params["locked"] = "false"
+		}
+	}
+	if cmdParams.Bot != nil {
+		if *cmdParams.Bot {
+			params["bot"] = "true"
+		} else {
+			params["bot"] = "false"
 		}
 	}
 
 	var err error
 	var avatar, headerImage []byte
 
-	avatar, err = readFile(avatarImagePath)
+	avatar, err = readFile(cmdParams.AvatarImagePath)
 	if err != nil {
 		return nil, err
 	}
 
-	headerImage, err = readFile(headerImagePath)
+	headerImage, err = readFile(cmdParams.HeaderImagePath)
 	if err != nil {
 		return nil, err
 	}
@@ -445,14 +465,14 @@ func (mc *Client) UpdateAccount(displayName, note, avatarImagePath, headerImageP
 	w := multipart.NewWriter(&formBuf)
 
 	if avatar != nil {
-		formWriter, err := w.CreateFormFile("avatar", filepath.Base(*avatarImagePath))
+		formWriter, err := w.CreateFormFile("avatar", filepath.Base(*cmdParams.AvatarImagePath))
 		if err != nil {
 			return nil, errors.Wrap(err, "avatar upload")
 		}
 		formWriter.Write(avatar)
 	}
 	if headerImage != nil {
-		formWriter, err := w.CreateFormFile("header", filepath.Base(*headerImagePath))
+		formWriter, err := w.CreateFormFile("header", filepath.Base(*cmdParams.HeaderImagePath))
 		if err != nil {
 			return nil, errors.Wrap(err, "header upload")
 		}
