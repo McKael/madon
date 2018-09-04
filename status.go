@@ -141,7 +141,7 @@ func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data int
 			if id < 1 {
 				return ErrInvalidID
 			}
-			qID := fmt.Sprintf("media_ids[%d]", i+1)
+			qID := fmt.Sprintf("media_ids[%d]", i)
 			params[qID] = strconv.FormatInt(id, 10)
 		}
 		if opts.Sensitive {

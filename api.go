@@ -94,12 +94,13 @@ func restAPI(request rest.Request) (*rest.Response, error) {
 			// It seems Mastodon doesn't like parameters with index
 			// numbers, but it needs the brackets.
 			// Let's check if the key matches '^.+\[.*\]$'
+			// Do not proceed if there's another bracket pair.
 			klen := len(key)
 			if klen == 0 {
 				continue
 			}
 			i := strings.Index(key, "[")
-			if key[klen-1] == ']' && i > 0 {
+			if i > 0 && key[klen-1] == ']' && strings.Index(key[i+1:], "[") < 0 {
 				// This is an array, let's remove the index number
 				key = key[:i] + "[]"
 			}
