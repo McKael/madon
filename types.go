@@ -39,27 +39,26 @@ type InstancePeer string
 
 // Account represents a Mastodon account entity
 type Account struct {
-	ID             int64     `json:"id,string"`
-	Username       string    `json:"username"`
-	Acct           string    `json:"acct"`
-	DisplayName    string    `json:"display_name"`
-	Note           string    `json:"note"`
-	URL            string    `json:"url"`
-	Avatar         string    `json:"avatar"`
-	AvatarStatic   string    `json:"avatar_static"`
-	Header         string    `json:"header"`
-	HeaderStatic   string    `json:"header_static"`
-	Locked         bool      `json:"locked"`
-	CreatedAt      time.Time `json:"created_at"`
-	FollowersCount int64     `json:"followers_count"`
-	FollowingCount int64     `json:"following_count"`
-	StatusesCount  int64     `json:"statuses_count"`
-	Moved          *Account  `json:"moved"`
-	Source         *struct { // Used for verify_credentials
-		Privacy   string `json:"privacy"`
-		Sensitive bool   `json:"sensitive"`
-		Note      string `json:"note"`
-	} `json:"source"`
+	ID             int64         `json:"id,string"`
+	Username       string        `json:"username"`
+	Acct           string        `json:"acct"`
+	DisplayName    string        `json:"display_name"`
+	Note           string        `json:"note"`
+	URL            string        `json:"url"`
+	Avatar         string        `json:"avatar"`
+	AvatarStatic   string        `json:"avatar_static"`
+	Header         string        `json:"header"`
+	HeaderStatic   string        `json:"header_static"`
+	Locked         bool          `json:"locked"`
+	CreatedAt      time.Time     `json:"created_at"`
+	FollowersCount int64         `json:"followers_count"`
+	FollowingCount int64         `json:"following_count"`
+	StatusesCount  int64         `json:"statuses_count"`
+	Moved          *Account      `json:"moved"`
+	Bot            bool          `json:"bot"`
+	Emojis         []Emoji       `json:"emojis"`
+	Fields         *[]Field      `json:"fields"`
+	Source         *SourceParams `json:"source"`
 }
 
 // Application represents a Mastodon application entity
@@ -184,6 +183,8 @@ type Relationship struct {
 	Requested           bool `json:"requested"`
 	DomainBlocking      bool `jsin:"domain_blocking"`
 	MutingNotifications bool `json:"muting_notifications"`
+	ShowingReblogs      bool `json:"showing_reblogs"`
+	Endorsed            bool `json:"endorsed"`
 }
 
 // Report represents a Mastodon report entity
@@ -212,6 +213,7 @@ type Status struct {
 	CreatedAt          time.Time    `json:"created_at"`
 	ReblogsCount       int64        `json:"reblogs_count"`
 	FavouritesCount    int64        `json:"favourites_count"`
+	RepliesCount       int64        `json:"replies_count"`
 	Reblogged          bool         `json:"reblogged"`
 	Favourited         bool         `json:"favourited"`
 	Muted              bool         `json:"muted"`
@@ -229,8 +231,13 @@ type Status struct {
 
 // Tag represents a Mastodon tag entity
 type Tag struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
+	Name    string `json:"name"`
+	URL     string `json:"url"`
+	History []struct {
+		Day      int64 `json:"day"`
+		Uses     int64 `json:"uses"`
+		Accounts int64 `json:"accounts"`
+	} `json:"history"`
 }
 
 // WeekActivity represents a Mastodon instance activity "week" entity
@@ -239,4 +246,20 @@ type WeekActivity struct {
 	Statuses      int64        `json:"statuses,string"`
 	Logins        int64        `json:"logins,string"`
 	Registrations int64        `json:"registrations,string"`
+}
+
+// Field is a single field structure
+// (Used for the verify_credentials endpoint)
+type Field struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// SourceParams is a source params structure
+type SourceParams struct { // Used for verify_credentials
+	Privacy   *string  `json:"privacy"`
+	Language  *string  `json:"language"`
+	Sensitive *bool    `json:"sensitive"`
+	Note      *string  `json:"note"`
+	Fields    *[]Field `json:"fields"`
 }
