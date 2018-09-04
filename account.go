@@ -35,14 +35,14 @@ type getAccountsOptions struct {
 
 // UpdateAccountParams contains option fields for the UpdateAccount command
 type UpdateAccountParams struct {
-	DisplayName     *string
-	Note            *string
-	AvatarImagePath *string
-	HeaderImagePath *string
-	Locked          *bool
-	Bot             *bool
-	//FieldsAttributes *[]Field
-	//Source           *SourceParams
+	DisplayName      *string
+	Note             *string
+	AvatarImagePath  *string
+	HeaderImagePath  *string
+	Locked           *bool
+	Bot              *bool
+	FieldsAttributes *[]Field
+	Source           *SourceParams
 }
 
 // updateRelationship returns a Relationship entity
@@ -446,6 +446,24 @@ func (mc *Client) UpdateAccount(cmdParams UpdateAccountParams) (*Account, error)
 		} else {
 			params["bot"] = "false"
 		}
+	}
+	if cmdParams.FieldsAttributes != nil {
+		if len(*cmdParams.FieldsAttributes) > 4 {
+			return nil, errors.New("too many fields (max=4)")
+		}
+		for i, attr := range *cmdParams.FieldsAttributes {
+			qName := fmt.Sprintf("fields_attributes[%d][name]", i)
+			qValue := fmt.Sprintf("fields_attributes[%d][value]", i)
+			params[qName] = attr.Name
+			params[qValue] = attr.Value
+		}
+	}
+	if cmdParams.Source != nil {
+		sourceJSON, err := json.Marshal(*cmdParams.Source)
+		if err != nil {
+			return nil, errors.Wrap(err, "could not encode source data")
+		}
+		params["source"] = string(sourceJSON)
 	}
 
 	var err error

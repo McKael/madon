@@ -257,9 +257,9 @@ type Field struct {
 
 // SourceParams is a source params structure
 type SourceParams struct { // Used for verify_credentials
-	Privacy   *string  `json:"privacy"`
-	Language  *string  `json:"language"`
-	Sensitive *bool    `json:"sensitive"`
-	Note      *string  `json:"note"`
-	Fields    *[]Field `json:"fields"`
+	Privacy   *string  `json:"privacy,omitempty"`
+	Language  *string  `json:"language,omitempty"`
+	Sensitive *bool    `json:"sensitive,omitempty"`
+	Note      *string  `json:"note,omitempty"`
+	Fields    *[]Field `json:"fields,omitempty"`
 }
