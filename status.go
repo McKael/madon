@@ -14,6 +14,16 @@ import (
 	"github.com/sendgrid/rest"
 )
 
+// PostStatusParams contains option fields for the PostStatus command
+type PostStatusParams struct {
+	Text        string
+	InReplyTo   int64
+	MediaIDs    []int64
+	Sensitive   bool
+	SpoilerText string
+	Visibility  string
+}
+
 // updateStatusOptions contains option fields for POST and DELETE API calls
 type updateStatusOptions struct {
 	// The ID is used for most commands
@@ -196,15 +206,15 @@ func (mc *Client) GetStatusFavouritedBy(statusID int64, lopt *LimitParams) ([]Ac
 // PostStatus posts a new "toot"
 // All parameters but "text" can be empty.
 // Visibility must be empty, or one of "direct", "private", "unlisted" and "public".
-func (mc *Client) PostStatus(text string, inReplyTo int64, mediaIDs []int64, sensitive bool, spoilerText string, visibility string) (*Status, error) {
+func (mc *Client) PostStatus(cmdParams PostStatusParams) (*Status, error) {
 	var status Status
 	o := updateStatusOptions{
-		Status:      text,
-		InReplyToID: inReplyTo,
-		MediaIDs:    mediaIDs,
-		Sensitive:   sensitive,
-		SpoilerText: spoilerText,
-		Visibility:  visibility,
+		Status:      cmdParams.Text,
+		InReplyToID: cmdParams.InReplyTo,
+		MediaIDs:    cmdParams.MediaIDs,
+		Sensitive:   cmdParams.Sensitive,
+		SpoilerText: cmdParams.SpoilerText,
+		Visibility:  cmdParams.Visibility,
 	}
 
 	err := mc.updateStatusData("status", o, &status)
