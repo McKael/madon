@@ -197,7 +197,7 @@ type Report struct {
 type Results struct {
 	Accounts []Account `json:"accounts"`
 	Statuses []Status  `json:"statuses"`
-	Hashtags []string  `json:"hashtags"`
+	Hashtags []Tag     `json:"hashtags"`
 }
 
 // Status represents a Mastodon status entity

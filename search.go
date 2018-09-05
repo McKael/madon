@@ -22,9 +22,20 @@ func (mc *Client) Search(query string, resolve bool) (*Results, error) {
 		params["resolve"] = "true"
 	}
 
-	var results Results
-	if err := mc.apiCall("search", rest.Get, params, nil, nil, &results); err != nil {
+	var resultsV1 struct {
+		Results
+		Hashtags []string `json:"hashtags"`
+	}
+	if err := mc.apiCall("search", rest.Get, params, nil, nil, &resultsV1); err != nil {
 		return nil, err
 	}
+
+	var results Results
+	results.Accounts = resultsV1.Accounts
+	results.Statuses = resultsV1.Statuses
+	for _, t := range resultsV1.Hashtags {
+		results.Hashtags = append(results.Hashtags, Tag{Name: t})
+	}
+
 	return &results, nil
 }
