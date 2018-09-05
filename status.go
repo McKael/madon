@@ -298,3 +298,12 @@ func (mc *Client) UnmuteConversation(statusID int64) (*Status, error) {
 	err := mc.updateStatusData("unmute", o, &status)
 	return &status, err
 }
+
+// GetFavourites returns the list of the user's favourites
+// If lopt.All is true, several requests will be made until the API server
+// has nothing to return.
+// If lopt.Limit is set (and not All), several queries can be made until the
+// limit is reached.
+func (mc *Client) GetFavourites(lopt *LimitParams) ([]Status, error) {
+	return mc.getMultipleStatuses("favourites", nil, lopt)
+}
