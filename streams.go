@@ -52,7 +52,7 @@ func (mc *Client) openStream(streamName, param string) (*websocket.Conn, error) 
 	}
 
 	// Build streaming websocket URL
-	u, err := url.Parse("ws" + mc.APIBase[4:] + "/streaming/")
+	u, err := url.Parse("ws" + mc.APIBase[4:] + "/v1/streaming/")
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot create Websocket URL")
 	}

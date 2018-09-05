@@ -25,9 +25,7 @@ const (
 	// MadonVersion contains the version of the Madon library
 	MadonVersion = "2.4.0-dev"
 
-	// API version implemented in this library
-	apiVersion     = "v1"
-	currentAPIPath = "/api/" + apiVersion
+	currentAPIPath = "/api"
 
 	// NoRedirect is the URI for no redirection in the App registration
 	NoRedirect = "urn:ietf:wg:oauth:2.0:oob"

@@ -26,7 +26,7 @@ func (mc *Client) Search(query string, resolve bool) (*Results, error) {
 		Results
 		Hashtags []string `json:"hashtags"`
 	}
-	if err := mc.apiCall("search", rest.Get, params, nil, nil, &resultsV1); err != nil {
+	if err := mc.apiCall("v1/"+"search", rest.Get, params, nil, nil, &resultsV1); err != nil {
 		return nil, err
 	}
 

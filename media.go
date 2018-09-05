@@ -101,7 +101,7 @@ func (mc *Client) UpdateMedia(mediaID int64, description, focus *string) (*Attac
 
 	endPoint := "media/" + strconv.FormatInt(mediaID, 10)
 	var attachment Attachment
-	if err := mc.apiCall(endPoint, rest.Put, params, nil, nil, &attachment); err != nil {
+	if err := mc.apiCall("v1/"+endPoint, rest.Put, params, nil, nil, &attachment); err != nil {
 		return nil, err
 	}
 	return &attachment, nil

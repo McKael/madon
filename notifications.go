@@ -33,7 +33,7 @@ func (mc *Client) GetNotifications(excludeTypes []string, lopt *LimitParams) ([]
 		}
 	}
 
-	if err := mc.apiCall("notifications", rest.Get, params, lopt, &links, &notifications); err != nil {
+	if err := mc.apiCall("v1/notifications", rest.Get, params, lopt, &links, &notifications); err != nil {
 		return nil, err
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
@@ -41,7 +41,7 @@ func (mc *Client) GetNotifications(excludeTypes []string, lopt *LimitParams) ([]
 		for (lopt.All || lopt.Limit > len(notifications)) && links.next != nil {
 			newlopt := links.next
 			links = apiLinks{}
-			if err := mc.apiCall("notifications", rest.Get, nil, newlopt, &links, &notifSlice); err != nil {
+			if err := mc.apiCall("v1/notifications", rest.Get, nil, newlopt, &links, &notifSlice); err != nil {
 				return nil, err
 			}
 			notifications = append(notifications, notifSlice...)
@@ -61,7 +61,7 @@ func (mc *Client) GetNotification(notificationID int64) (*Notification, error) {
 
 	var endPoint = "notifications/" + strconv.FormatInt(notificationID, 10)
 	var notification Notification
-	if err := mc.apiCall(endPoint, rest.Get, nil, nil, nil, &notification); err != nil {
+	if err := mc.apiCall("v1/"+endPoint, rest.Get, nil, nil, nil, &notification); err != nil {
 		return nil, err
 	}
 	if notification.ID == 0 {
@@ -78,13 +78,13 @@ func (mc *Client) DismissNotification(notificationID int64) error {
 
 	endPoint := "notifications/dismiss"
 	params := apiCallParams{"id": strconv.FormatInt(notificationID, 10)}
-	err := mc.apiCall(endPoint, rest.Post, params, nil, nil, &Notification{})
+	err := mc.apiCall("v1/"+endPoint, rest.Post, params, nil, nil, &Notification{})
 	return err
 }
 
 // ClearNotifications deletes all notifications from the Mastodon server for
 // the authenticated user
 func (mc *Client) ClearNotifications() error {
-	err := mc.apiCall("notifications/clear", rest.Post, nil, nil, nil, &Notification{})
+	err := mc.apiCall("v1/notifications/clear", rest.Post, nil, nil, nil, &Notification{})
 	return err
 }

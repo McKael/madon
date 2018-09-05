@@ -17,7 +17,7 @@ func (mc *Client) GetSuggestions(lopt *LimitParams) ([]Account, error) {
 	endPoint := "suggestions"
 	method := rest.Get
 	var accountList []Account
-	if err := mc.apiCall(endPoint, method, nil, lopt, nil, &accountList); err != nil {
+	if err := mc.apiCall("v1/"+endPoint, method, nil, lopt, nil, &accountList); err != nil {
 		return nil, err
 	}
 	return accountList, nil
@@ -27,5 +27,5 @@ func (mc *Client) GetSuggestions(lopt *LimitParams) ([]Account, error) {
 func (mc *Client) DeleteSuggestion(accountID int64) error {
 	endPoint := "suggestions/" + strconv.FormatInt(accountID, 10)
 	method := rest.Delete
-	return mc.apiCall(endPoint, method, nil, nil, nil, nil)
+	return mc.apiCall("v1/"+endPoint, method, nil, nil, nil, nil)
 }

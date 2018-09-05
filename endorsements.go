@@ -15,7 +15,7 @@ func (mc *Client) GetEndorsements(lopt *LimitParams) ([]Account, error) {
 	endPoint := "endorsements"
 	method := rest.Get
 	var accountList []Account
-	if err := mc.apiCall(endPoint, method, nil, lopt, nil, &accountList); err != nil {
+	if err := mc.apiCall("v1/"+endPoint, method, nil, lopt, nil, &accountList); err != nil {
 		return nil, err
 	}
 	return accountList, nil

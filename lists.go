@@ -21,7 +21,7 @@ func (mc *Client) GetList(listID int64) (*List, error) {
 	}
 	endPoint := "lists/" + strconv.FormatInt(listID, 10)
 	var list List
-	if err := mc.apiCall(endPoint, rest.Get, nil, nil, nil, &list); err != nil {
+	if err := mc.apiCall("v1/"+endPoint, rest.Get, nil, nil, nil, &list); err != nil {
 		return nil, err
 	}
 	return &list, nil
@@ -40,7 +40,7 @@ func (mc *Client) GetLists(accountID int64, lopt *LimitParams) ([]List, error) {
 
 	var lists []List
 	var links apiLinks
-	if err := mc.apiCall(endPoint, rest.Get, nil, lopt, &links, &lists); err != nil {
+	if err := mc.apiCall("v1/"+endPoint, rest.Get, nil, lopt, &links, &lists); err != nil {
 		return nil, err
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
@@ -48,7 +48,7 @@ func (mc *Client) GetLists(accountID int64, lopt *LimitParams) ([]List, error) {
 		for (lopt.All || lopt.Limit > len(lists)) && links.next != nil {
 			newlopt := links.next
 			links = apiLinks{}
-			if err := mc.apiCall(endPoint, rest.Get, nil, newlopt, &links, &listSlice); err != nil {
+			if err := mc.apiCall("v1/"+endPoint, rest.Get, nil, newlopt, &links, &listSlice); err != nil {
 				return nil, err
 			}
 			lists = append(lists, listSlice...)
@@ -103,7 +103,7 @@ func (mc *Client) AddListAccounts(listID int64, accountIDs []int64) error {
 		qID := fmt.Sprintf("account_ids[%d]", i)
 		params[qID] = strconv.FormatInt(id, 10)
 	}
-	return mc.apiCall(endPoint, method, params, nil, nil, nil)
+	return mc.apiCall("v1/"+endPoint, method, params, nil, nil, nil)
 }
 
 // RemoveListAccounts removes the accounts from the given list
@@ -118,7 +118,7 @@ func (mc *Client) RemoveListAccounts(listID int64, accountIDs []int64) error {
 		qID := fmt.Sprintf("account_ids[%d]", i)
 		params[qID] = strconv.FormatInt(id, 10)
 	}
-	return mc.apiCall(endPoint, method, params, nil, nil, nil)
+	return mc.apiCall("v1/"+endPoint, method, params, nil, nil, nil)
 }
 
 func (mc *Client) setSingleList(method rest.Method, listID int64, params apiCallParams) (*List, error) {
@@ -129,7 +129,7 @@ func (mc *Client) setSingleList(method rest.Method, listID int64, params apiCall
 		endPoint = "lists"
 	}
 	var list List
-	if err := mc.apiCall(endPoint, method, params, nil, nil, &list); err != nil {
+	if err := mc.apiCall("v1/"+endPoint, method, params, nil, nil, &list); err != nil {
 		return nil, err
 	}
 	return &list, nil

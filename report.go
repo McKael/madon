@@ -17,7 +17,7 @@ import (
 // (I don't know if the limit options are used by the API server.)
 func (mc *Client) GetReports(lopt *LimitParams) ([]Report, error) {
 	var reports []Report
-	if err := mc.apiCall("reports", rest.Get, nil, lopt, nil, &reports); err != nil {
+	if err := mc.apiCall("v1/reports", rest.Get, nil, lopt, nil, &reports); err != nil {
 		return nil, err
 	}
 	return reports, nil
@@ -41,7 +41,7 @@ func (mc *Client) ReportUser(accountID int64, statusIDs []int64, comment string)
 	}
 
 	var report Report
-	if err := mc.apiCall("reports", rest.Post, params, nil, nil, &report); err != nil {
+	if err := mc.apiCall("v1/reports", rest.Post, params, nil, nil, &report); err != nil {
 		return nil, err
 	}
 	return &report, nil

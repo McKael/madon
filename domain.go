@@ -17,7 +17,7 @@ func (mc *Client) GetBlockedDomains(lopt *LimitParams) ([]DomainName, error) {
 	const endPoint = "domain_blocks"
 	var links apiLinks
 	var domains []DomainName
-	if err := mc.apiCall(endPoint, rest.Get, nil, lopt, &links, &domains); err != nil {
+	if err := mc.apiCall("v1/"+endPoint, rest.Get, nil, lopt, &links, &domains); err != nil {
 		return nil, err
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
@@ -25,7 +25,7 @@ func (mc *Client) GetBlockedDomains(lopt *LimitParams) ([]DomainName, error) {
 		for (lopt.All || lopt.Limit > len(domains)) && links.next != nil {
 			newlopt := links.next
 			links = apiLinks{}
-			if err := mc.apiCall(endPoint, rest.Get, nil, newlopt, &links, &domainSlice); err != nil {
+			if err := mc.apiCall("v1/"+endPoint, rest.Get, nil, newlopt, &links, &domainSlice); err != nil {
 				return nil, err
 			}
 			domains = append(domains, domainSlice...)
@@ -40,7 +40,7 @@ func (mc *Client) BlockDomain(domain DomainName) error {
 	const endPoint = "domain_blocks"
 	params := make(apiCallParams)
 	params["domain"] = string(domain)
-	return mc.apiCall(endPoint, rest.Post, params, nil, nil, nil)
+	return mc.apiCall("v1/"+endPoint, rest.Post, params, nil, nil, nil)
 }
 
 // UnblockDomain unblocks the specified domain
@@ -48,5 +48,5 @@ func (mc *Client) UnblockDomain(domain DomainName) error {
 	const endPoint = "domain_blocks"
 	params := make(apiCallParams)
 	params["domain"] = string(domain)
-	return mc.apiCall(endPoint, rest.Delete, params, nil, nil, nil)
+	return mc.apiCall("v1/"+endPoint, rest.Delete, params, nil, nil, nil)
 }

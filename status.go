@@ -44,7 +44,7 @@ type updateStatusOptions struct {
 func (mc *Client) getMultipleStatuses(endPoint string, params apiCallParams, lopt *LimitParams) ([]Status, error) {
 	var statuses []Status
 	var links apiLinks
-	if err := mc.apiCall(endPoint, rest.Get, params, lopt, &links, &statuses); err != nil {
+	if err := mc.apiCall("v1/"+endPoint, rest.Get, params, lopt, &links, &statuses); err != nil {
 		return nil, err
 	}
 	if lopt != nil { // Fetch more pages to reach our limit
@@ -52,7 +52,7 @@ func (mc *Client) getMultipleStatuses(endPoint string, params apiCallParams, lop
 		for (lopt.All || lopt.Limit > len(statuses)) && links.next != nil {
 			newlopt := links.next
 			links = apiLinks{}
-			if err := mc.apiCall(endPoint, rest.Get, params, newlopt, &links, &statusSlice); err != nil {
+			if err := mc.apiCall("v1/"+endPoint, rest.Get, params, newlopt, &links, &statusSlice); err != nil {
 				return nil, err
 			}
 			statuses = append(statuses, statusSlice...)
@@ -83,7 +83,7 @@ func (mc *Client) queryStatusData(statusID int64, op string, data interface{}) e
 		endPoint += "/" + op
 	}
 
-	return mc.apiCall(endPoint, rest.Get, nil, nil, nil, data)
+	return mc.apiCall("v1/"+endPoint, rest.Get, nil, nil, nil, data)
 }
 
 // updateStatusData updates the statuses
@@ -155,7 +155,7 @@ func (mc *Client) updateStatusData(op string, opts updateStatusOptions, data int
 		}
 	}
 
-	return mc.apiCall(endPoint, method, params, nil, nil, data)
+	return mc.apiCall("v1/"+endPoint, method, params, nil, nil, data)
 }
 
 // GetStatus returns a status
