@@ -55,7 +55,7 @@ func (mc *Client) updateRelationship(op string, id int64, params apiCallParams) 
 	strID := strconv.FormatInt(id, 10)
 
 	switch op {
-	case "follow", "unfollow", "block", "unblock", "mute", "unmute":
+	case "follow", "unfollow", "block", "unblock", "mute", "unmute", "pin", "unpin":
 		endPoint = "accounts/" + strID + "/" + op
 	default:
 		return nil, ErrInvalidParameter
