@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-// ActivityTime is a custom type for the time returned by instance/activity
-type ActivityTime struct {
+// MastodonDate is a custom type for the timestamps returned by some API calls
+type MastodonDate struct {
 	time.Time
 }
 
@@ -234,15 +234,15 @@ type Tag struct {
 	Name    string `json:"name"`
 	URL     string `json:"url"`
 	History []struct {
-		Day      int64 `json:"day"`
-		Uses     int64 `json:"uses"`
-		Accounts int64 `json:"accounts"`
+		Day      MastodonDate `json:"day"`
+		Uses     int64        `json:"uses,string"`
+		Accounts int64        `json:"accounts,string"`
 	} `json:"history"`
 }
 
 // WeekActivity represents a Mastodon instance activity "week" entity
 type WeekActivity struct {
-	Week          ActivityTime `json:"week"`
+	Week          MastodonDate `json:"week"`
 	Statuses      int64        `json:"statuses,string"`
 	Logins        int64        `json:"logins,string"`
 	Registrations int64        `json:"registrations,string"`

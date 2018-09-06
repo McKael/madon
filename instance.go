@@ -7,11 +7,6 @@ Licensed under the MIT license.  Please see the LICENSE file is this directory.
 package madon
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
-	"time"
-
 	"github.com/sendgrid/rest"
 )
 
@@ -44,25 +39,4 @@ func (mc *Client) GetInstanceActivity() ([]WeekActivity, error) {
 		return nil, err
 	}
 	return activity, nil
-}
-
-/* Activity time handling */
-
-// UnmarshalJSON handles deserialization for custom ActivityTime type
-func (act *ActivityTime) UnmarshalJSON(b []byte) error {
-	s, err := strconv.ParseInt(strings.Trim(string(b), "\""), 10, 64)
-	if err != nil {
-		return err
-	}
-	if s == 0 {
-		act.Time = time.Time{}
-		return nil
-	}
-	act.Time = time.Unix(s, 0)
-	return nil
-}
-
-// MarshalJSON handles serialization for custom ActivityTime type
-func (act *ActivityTime) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("\"%d\"", act.Unix())), nil
 }

@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sendgrid/rest"
@@ -228,4 +229,30 @@ func (mc *Client) apiCall(endPoint string, method rest.Method, params apiCallPar
 		return errors.Wrapf(err, "cannot decode API response (%s)", method)
 	}
 	return nil
+}
+
+/* Mastodon timestamp handling */
+
+// MastodonDate is a custom type for the timestamps returned by some API calls
+// It is used, for example, by 'v1/instance/activity' and 'v2/search'.
+// The date returned by those Mastodon API calls is a string containing a
+// timestamp in seconds...
+
+// UnmarshalJSON handles deserialization for custom MastodonDate type
+func (act *MastodonDate) UnmarshalJSON(b []byte) error {
+	s, err := strconv.ParseInt(strings.Trim(string(b), "\""), 10, 64)
+	if err != nil {
+		return err
+	}
+	if s == 0 {
+		act.Time = time.Time{}
+		return nil
+	}
+	act.Time = time.Unix(s, 0)
+	return nil
+}
+
+// MarshalJSON handles serialization for custom MastodonDate type
+func (act *MastodonDate) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("\"%d\"", act.Unix())), nil
 }
