@@ -130,7 +130,10 @@ func restAPI(request rest.Request) (*rest.Response, error) {
 		return nil, err
 	}
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return nil, errors.Errorf("bad server status code (%d): %s",
+		// Please note that the error string code is used by Search()
+		// to check the error cause.
+		const errFormatString = "bad server status code (%d)"
+		return nil, errors.Errorf(errFormatString+": %s",
 			res.StatusCode, http.StatusText(res.StatusCode))
 	}
 
