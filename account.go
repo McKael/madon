@@ -459,11 +459,17 @@ func (mc *Client) UpdateAccount(cmdParams UpdateAccountParams) (*Account, error)
 		}
 	}
 	if cmdParams.Source != nil {
-		sourceJSON, err := json.Marshal(*cmdParams.Source)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not encode source data")
+		s := cmdParams.Source
+
+		if s.Privacy != nil {
+			params["source[privacy]"] = *s.Privacy
 		}
-		params["source"] = string(sourceJSON)
+		if s.Language != nil {
+			params["source[language]"] = *s.Language
+		}
+		if s.Sensitive != nil {
+			params["source[sensitive]"] = fmt.Sprintf("%v", *s.Sensitive)
+		}
 	}
 
 	var err error
