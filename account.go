@@ -362,7 +362,7 @@ func (mc *Client) GetAccountRelationships(accountIDs []int64) ([]Relationship, e
 		if id < 1 {
 			return nil, ErrInvalidID
 		}
-		qID := fmt.Sprintf("id[%d]", i)
+		qID := fmt.Sprintf("[%d]id", i)
 		params[qID] = strconv.FormatInt(id, 10)
 	}
 

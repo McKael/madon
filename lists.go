@@ -100,7 +100,7 @@ func (mc *Client) AddListAccounts(listID int64, accountIDs []int64) error {
 		if id < 1 {
 			return ErrInvalidID
 		}
-		qID := fmt.Sprintf("account_ids[%d]", i)
+		qID := fmt.Sprintf("[%d]account_ids", i)
 		params[qID] = strconv.FormatInt(id, 10)
 	}
 	return mc.apiCall("v1/"+endPoint, method, params, nil, nil, nil)
@@ -115,7 +115,7 @@ func (mc *Client) RemoveListAccounts(listID int64, accountIDs []int64) error {
 		if id < 1 {
 			return ErrInvalidID
 		}
-		qID := fmt.Sprintf("account_ids[%d]", i)
+		qID := fmt.Sprintf("[%d]account_ids", i)
 		params[qID] = strconv.FormatInt(id, 10)
 	}
 	return mc.apiCall("v1/"+endPoint, method, params, nil, nil, nil)

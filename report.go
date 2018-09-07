@@ -36,7 +36,7 @@ func (mc *Client) ReportUser(accountID int64, statusIDs []int64, comment string)
 		if id < 1 {
 			return nil, ErrInvalidID
 		}
-		qID := fmt.Sprintf("status_ids[%d]", i)
+		qID := fmt.Sprintf("[%d]status_ids", i)
 		params[qID] = strconv.FormatInt(id, 10)
 	}
 

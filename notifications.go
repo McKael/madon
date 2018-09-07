@@ -28,7 +28,7 @@ func (mc *Client) GetNotifications(excludeTypes []string, lopt *LimitParams) ([]
 	if len(excludeTypes) > 0 {
 		params = make(apiCallParams)
 		for i, eType := range excludeTypes {
-			qID := fmt.Sprintf("exclude_types[%d]", i)
+			qID := fmt.Sprintf("[%d]exclude_types", i)
 			params[qID] = eType
 		}
 	}

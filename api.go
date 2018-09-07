@@ -91,6 +91,7 @@ func restAPI(request rest.Request) (*rest.Response, error) {
 		// Add parameters to the URL
 		request.BaseURL += "?"
 		urlp := url.Values{}
+		arrayRe := regexp.MustCompile(`^\[\d+\](.*)$`)
 		for key, value := range request.QueryParams {
 			// It seems Mastodon doesn't like parameters with index
 			// numbers, but it needs the brackets.
@@ -100,10 +101,9 @@ func restAPI(request rest.Request) (*rest.Response, error) {
 			if klen == 0 {
 				continue
 			}
-			i := strings.Index(key, "[")
-			if i > 0 && key[klen-1] == ']' && strings.Index(key[i+1:], "[") < 0 {
+			if m := arrayRe.FindStringSubmatch(key); len(m) > 0 {
 				// This is an array, let's remove the index number
-				key = key[:i] + "[]"
+				key = m[1] + "[]"
 			}
 			urlp.Add(key, value)
 		}
