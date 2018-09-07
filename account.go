@@ -499,7 +499,7 @@ func (mc *Client) UpdateAccount(cmdParams UpdateAccountParams) (*Account, error)
 	w.Close()
 
 	// Prepare the request
-	req, err := mc.prepareRequest(endPoint, rest.Patch, params)
+	req, err := mc.prepareRequest("v1/"+endPoint, rest.Patch, params)
 	if err != nil {
 		return nil, errors.Wrap(err, "prepareRequest failed")
 	}
