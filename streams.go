@@ -25,14 +25,15 @@ type StreamEvent struct {
 // openStream opens a stream URL and returns an http.Response
 // Note that the caller should close the connection when it's done reading
 // the stream.
-// The stream name can be "user", "local", "public", "list" or "hashtag".
+// The stream name can be "user", "local", "public", "direct", "list" or
+// "hashtag".
 // When it is "hashtag", the param argument contains the hashtag.
 // When it is "list", the param argument contains the list ID.
 func (mc *Client) openStream(streamName, param string) (*websocket.Conn, error) {
 	var tag, list string
 
 	switch streamName {
-	case "user", "public", "public:local":
+	case "user", "public", "public:local", "direct":
 	case "hashtag":
 		if param == "" {
 			return nil, ErrInvalidParameter

@@ -12,9 +12,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-// GetTimelines returns a timeline (a list of statuses
-// timeline can be "home", "public", a hashtag (use ":hashtag" or "#hashtag")
-// or a list (use "!N", e.g. "!42" for list ID #42).
+// GetTimelines returns a timeline (a list of statuses)
+// timeline can be "home", "public", "direct", a hashtag (use ":hashtag" or
+// "#hashtag") or a list (use "!N", e.g. "!42" for list ID #42).
 // For the public timelines, you can set 'local' to true to get only the
 // local instance.
 // Set 'onlyMedia' to true to only get statuses that have media attachments.
@@ -26,7 +26,7 @@ func (mc *Client) GetTimelines(timeline string, local, onlyMedia bool, lopt *Lim
 	var endPoint string
 
 	switch {
-	case timeline == "home", timeline == "public":
+	case timeline == "home", timeline == "public", timeline == "direct":
 		endPoint = "timelines/" + timeline
 	case strings.HasPrefix(timeline, ":"), strings.HasPrefix(timeline, "#"):
 		hashtag := timeline[1:]
