@@ -71,7 +71,7 @@ func NewApp(name, website string, scopes []string, redirectURI, instanceName str
 	}
 
 	var app registerApp
-	if err := mc.apiCall("apps", rest.Post, params, nil, nil, &app); err != nil {
+	if err := mc.apiCall("v1/apps", rest.Post, params, nil, nil, &app); err != nil {
 		return nil, err
 	}
 
