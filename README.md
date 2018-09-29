@@ -19,6 +19,9 @@ To install the library (Go >= v1.5 required):
 
     go get github.com/McKael/madon
 
+For minimal compatibility with Go modules support (in Go v1.11), it is
+recommended to use Go version 1.9+.
+
 You can test it with my CLI tool:
 
     go get github.com/McKael/madonctl
