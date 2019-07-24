@@ -38,7 +38,7 @@ func (mc *Client) UploadMedia(filePath, description, focus string) (*Attachment,
 	return mc.UploadMediaReader(f, filepath.Base(f.Name()), description, focus)
 }
 
-// UploadMedia uploads data from the given reader and returns an attachment
+// UploadMediaReader uploads data from the given reader and returns an attachment
 // name, description and focus arguments can be empty strings.
 // 'focus' is the "focal point", written as two comma-delimited floating points.
 func (mc *Client) UploadMediaReader(f io.Reader, name, description, focus string) (*Attachment, error) {
