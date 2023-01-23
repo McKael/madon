@@ -51,11 +51,10 @@ type UpdateAccountParams struct {
 func (mc *Client) updateRelationship(op string, id ActivityID, params apiCallParams) (*Relationship, error) {
 	var endPoint string
 	method := rest.Post
-	strID := id
 
 	switch op {
 	case "follow", "unfollow", "block", "unblock", "mute", "unmute", "pin", "unpin":
-		endPoint = "accounts/" + strID + "/" + op
+		endPoint = "accounts/" + id + "/" + op
 	default:
 		return nil, ErrInvalidParameter
 	}
@@ -74,17 +73,16 @@ func (mc *Client) updateRelationship(op string, id ActivityID, params apiCallPar
 func (mc *Client) getSingleAccount(op string, id ActivityID) (*Account, error) {
 	var endPoint string
 	method := rest.Get
-	strID := id
 
 	switch op {
 	case "account":
-		endPoint = "accounts/" + strID
+		endPoint = "accounts/" + id
 	case "verify_credentials":
 		endPoint = "accounts/verify_credentials"
 	case "follow_requests/authorize", "follow_requests/reject":
 		// The documentation is incorrect, the endpoint actually
 		// is "follow_requests/:id/{authorize|reject}"
-		endPoint = op[:16] + strID + "/" + op[16:]
+		endPoint = op[:16] + id + "/" + op[16:]
 		method = rest.Post
 	default:
 		return nil, ErrInvalidParameter
