@@ -1,4 +1,4 @@
-module github.com/McKael/madon/v2
+module github.com/McKael/madon/v3
 
 require (
 	github.com/gorilla/websocket v1.5.0

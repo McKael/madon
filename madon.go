@@ -23,7 +23,7 @@ type apiCallParams map[string]string
 
 const (
 	// MadonVersion contains the version of the Madon library
-	MadonVersion = "2.4.0"
+	MadonVersion = "3.0.0-dev"
 
 	currentAPIPath = "/api"
 
