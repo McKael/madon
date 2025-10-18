@@ -17,9 +17,9 @@ import (
 
 // StreamEvent contains a single event from the streaming API
 type StreamEvent struct {
-	Event string      // Name of the event (error, update, notification or delete)
-	Data  interface{} // Status, Notification or status ID
-	Error error       // Error message from the StreamListener
+	Event string // Name of the event (error, update, notification or delete)
+	Data  any    // Status, Notification or status ID
+	Error error  // Error message from the StreamListener
 }
 
 // openStream opens a stream URL and returns an http.Response
@@ -92,7 +92,7 @@ func (mc *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, done
 	for {
 		var msg struct {
 			Event   string
-			Payload interface{}
+			Payload any
 		}
 
 		err := c.ReadJSON(&msg)
@@ -105,7 +105,7 @@ func (mc *Client) readStream(events chan<- StreamEvent, stopCh <-chan bool, done
 			break
 		}
 
-		var obj interface{}
+		var obj any
 
 		// Decode API object
 		switch msg.Event {
