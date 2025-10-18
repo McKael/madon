@@ -54,15 +54,9 @@ func parseLink(links []string) (*apiLinks, error) {
 			lp = new(LimitParams)
 			if since != "" {
 				lp.SinceID = since
-				if err != nil {
-					return al, err
-				}
 			}
 			if max != "" {
 				lp.MaxID = max
-				if err != nil {
-					return al, err
-				}
 			}
 			if lim != "" {
 				lp.Limit, err = strconv.Atoi(lim)
