@@ -8,8 +8,6 @@ Golang library for the Mastodon API
 
 `madon` is a [Go](https://golang.org/) library to access the Mastondon REST API.
 
-This implementation covers 100% of the current API, including the streaming API.
-
 The [madonctl](https://github.com/McKael/madonctl) console client uses this library exhaustively.
 
 ## Installation
