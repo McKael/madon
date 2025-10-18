@@ -5,8 +5,8 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sendgrid/rest v2.6.9+incompatible
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/net v0.42.0
-	golang.org/x/oauth2 v0.30.0
+	golang.org/x/net v0.46.0
+	golang.org/x/oauth2 v0.32.0
 )
 
 require (
@@ -17,6 +17,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
 
-go 1.23.0
+go 1.24.0
 
 toolchain go1.24.5
