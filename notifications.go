@@ -74,9 +74,8 @@ func (mc *Client) DismissNotification(notificationID ActivityID) error {
 		return ErrInvalidID
 	}
 
-	endPoint := "notifications/dismiss"
-	params := apiCallParams{"id": notificationID}
-	err := mc.apiCall("v1/"+endPoint, rest.Post, params, nil, nil, &Notification{})
+	endPoint := "notifications/" + notificationID + "/dismiss"
+	err := mc.apiCall("v1/"+endPoint, rest.Post, nil, nil, nil, &Notification{})
 	return err
 }
 
